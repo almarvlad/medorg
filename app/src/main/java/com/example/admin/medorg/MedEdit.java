@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +44,7 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
     // для сохранения в бд
     EditText editMedName;
     EditText editTimeFreq;
-    Button saveMed;
+    public static final String EXTRA_REPLY = "com.example.android.wordlistsql.REPLY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,24 +132,28 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
 
         editMedName = (EditText) findViewById(R.id.editMedName);
         editTimeFreq = (EditText) findViewById(R.id.editTimeFreq);
-        saveMed = (Button) findViewById(R.id.save_btn);
+        final Button savebtn = (Button) findViewById(R.id.save_btn);
 
-        final AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "production")
-                .allowMainThreadQueries()
-                .build();
-
-        saveMed.setOnClickListener(new View.OnClickListener() {
+        savebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO save to database
-                Log.d(TAG,"onClick: medName: " + editMedName.getText().toString());
-                UserMedicine med = new UserMedicine(editMedName.getText().toString(), Float.parseFloat(editTimeFreq.getText().toString()));
-                db.Dao().insertAll(med);
-                FragmentMeds fmeds = new FragmentMeds();
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, fmeds).commit();
+/*
 
+               if (TextUtils.isEmpty(editMedName.getText())) {
+                   setResult(RESULT_CANCELED, replyIntent);
+               } else {
+
+               }
+*/
+                Intent replyIntent = new Intent();
+                String word = editMedName.getText().toString();
+                replyIntent.putExtra(EXTRA_REPLY, word);
+                setResult(RESULT_OK, replyIntent);
+                finish();
             }
         });
+
+
 
     }
 
