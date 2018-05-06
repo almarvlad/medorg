@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MedEdit">
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="909dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-269dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+            <!-- НАЗВАНИЕ ЛЕКАРСТВА -->
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_name"
+                style="@style/EditMedCards"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <LinearLayout style="@style/EditMedCardsPadding">
+
+                    <TextView
+                        android:id="@+id/info_text1"
+                        style="@style/EditMedTitle"
+                        android:layout_height="wrap_content"
+                        android:text="@string/MedName" />
+
+                    <EditText
+                        android:id="@+id/editMedName"
+                        style="@style/MedEditText"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName" />
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <!-- ВРЕМЯ ПРИЁМА -->
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_time"
+                style="@style/EditMedCards"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <LinearLayout style="@style/EditMedCardsPadding">
+
+                    <TextView
+                        android:id="@+id/info_text2"
+                        style="@style/EditMedTitle"
+                        android:layout_height="wrap_content"
+                        android:text="@string/MedTime" />
+
+                    <RadioGroup
+                        android:id="@+id/time_rdg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <RadioButton
+                            android:id="@+id/radio_frequency"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/frequency"
+                            android:checked="true"
+                            style="@style/EditMedTitle"
+                            android:textColor="#000"/>
+                        <RadioButton
+                            android:id="@+id/radio_interval"
+                            style="@style/EditMedTitle"
+                            android:textColor="#000"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/intervals"
+                            android:layout_weight="1" />
+                    </RadioGroup>
+
+                    <LinearLayout
+                        android:id="@+id/time_frequency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center"
+                        android:visibility="visible">
+
+                        <EditText
+                            android:id="@+id/editTimeFreq"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:numeric="decimal"
+                            android:text="2"
+                            android:textSize="24sp" />
+                        <TextView
+                            style="@style/EditMedTitle"
+                            android:textSize="24sp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text=" раз(а) в день"
+                            android:textColor="#000" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/time_intervals"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center"
+                        android:visibility="gone">
+                        <TextView
+                            style="@style/EditMedTitle"
+                            android:textSize="24sp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Каждые "
+                            android:textColor="#000" />
+                        <EditText
+                            android:id="@+id/editTimeInt"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:text="2"
+                            android:textSize="24sp" />
+                        <TextView
+                            style="@style/EditMedTitle"
+                            android:textSize="24sp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text=" часа(ов)"
+                            android:textColor="#000" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <!-- РАСПИСАНИЕ КУРСА ПРИЁМА ЛЕКАРСТВА (КАКИЕ ДНИ) -->
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_days"
+                style="@style/EditMedCards"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <LinearLayout style="@style/EditMedCardsPadding">
+
+                    <TextView
+                        android:id="@+id/info_text3"
+                        style="@style/EditMedTitle"
+                        android:layout_height="wrap_content"
+                        android:text="@string/MedDays" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/EditMedTitle"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/beg"
+                            android:textColor="#000" />
+
+                        <TextView
+                            android:id="@+id/date"
+                            style="@style/EditMedTitle"
+                            android:layout_width="195dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:text="12 мая 2018 г."
+                            android:textColor="#000" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginTop="8dp"
+                        android:background="?android:attr/listDivider" />
+
+                    <TextView
+                        style="@style/EditMedTitle"
+                        android:layout_height="wrap_content"
+                        android:text="@string/duration"
+                        android:textColor="#000" />
+                    <RadioGroup
+                        android:id="@+id/duration_rdg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <RadioButton
+                            android:id="@+id/radio_continuous"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:checked="true"
+                            style="@style/EditMedTitle"
+                            android:gravity="center"
+                            android:text="@string/continuous"
+                            android:textColor="#000"/>
+                        <RadioButton
+                            android:id="@+id/radio_numdays"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/EditMedTitle"
+                            android:text="количество дней"
+                            android:textColor="#000"/>
+                    </RadioGroup>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginTop="8dp"
+                        android:background="?android:attr/listDivider" />
+
+                    <TextView
+                        style="@style/EditMedTitle"
+                        android:layout_height="wrap_content"
+                        android:text="Дни приёма:"
+                        android:textColor="#000" />
+                    <RadioGroup
+                        android:id="@+id/days_rdg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <RadioButton
+                            android:id="@+id/radio_everyday"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:layout_weight="1"
+                            style="@style/EditMedTitle"
+                            android:text="@string/everyday"
+                            android:textColor="#000" />
+                        <RadioButton
+                            android:id="@+id/radio_weekdays"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:clickable="true"
+                            style="@style/EditMedTitle"
+                            android:text="определённые дни"
+                            android:textColor="#000" />
+                    </RadioGroup>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <!-- ВНЕШНИЙ ВИД ЛЕКАРСТВА -->
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_pic"
+                style="@style/EditMedCards"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <LinearLayout style="@style/EditMedCardsPadding">
+
+                    <TextView
+                        android:id="@+id/info_text5"
+                        style="@style/EditMedTitle"
+                        android:layout_height="wrap_content"
+                        android:text="@string/MedPic" />
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <!-- ДОЗИРОВКА -->
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_dose"
+                style="@style/EditMedCards"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <LinearLayout style="@style/EditMedCardsPadding">
+
+                    <TextView
+                        style="@style/EditMedTitle"
+                        android:layout_height="wrap_content"
+                        android:text="@string/MedDose" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center">
+                        <EditText
+                            android:id="@+id/editDose"
+                            android:layout_width="50dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:layout_weight="1"
+                            android:text="1"
+                            android:textSize="24sp"
+                            android:inputType="numberDecimal"/>
+                        <Spinner
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:entries="@array/dose_list"
+                            android:theme="@style/spinnerTheme">
+
+                        </Spinner>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <!-- ИНСТРУКЦИИ ПО ПРИЁМУ -->
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_instructions"
+                style="@style/EditMedCards"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <LinearLayout style="@style/EditMedCardsPadding">
+
+                    <TextView
+                        style="@style/EditMedTitle"
+                        android:layout_height="wrap_content"
+                        android:text="@string/MedInstr" />
+
+                    <RadioGroup
+                        android:id="@+id/instruct_rdg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <RadioButton
+                            android:id="@+id/radio_before"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/EditMedTitle"
+                            android:text="@string/before"
+                            android:textColor="#000" />
+                        <RadioButton
+                            android:id="@+id/radio_at"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/EditMedTitle"
+                            android:text="@string/atmeal"
+                            android:textColor="#000"/>
+                        <RadioButton
+                            android:id="@+id/radio_after"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/EditMedTitle"
+                            android:text="@string/after"
+                            android:textColor="#000"/>
+                        <RadioButton
+                            android:id="@+id/radio_unimportant"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            style="@style/EditMedTitle"
+                            android:text="@string/unimportant"
+                            android:textColor="#000" />
+                    </RadioGroup>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="8dp"
+                        android:background="?android:attr/listDivider" />
+
+                    <EditText
+                        android:id="@+id/add_instr"
+                        android:textSize="20sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:inputType="textPersonName"
+                        android:hint="@string/add_instr"/>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <!-- СОВМЕСТИМОСТЬ С ДРУГИМИ ЛЕКАРСТВАМИ -->
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_compat"
+                style="@style/EditMedCards"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <LinearLayout style="@style/EditMedCardsPadding">
+                    <TextView
+                        style="@style/EditMedTitle"
+                        android:layout_height="wrap_content"
+                        android:text="@string/compatibility" />
+                    <TextView
+                        style="@style/EditMedTitle"
+                        android:layout_height="wrap_content"
+                        android:text="Есть ли несовмесимость с другими лекарствами?"
+                        android:textColor="#000" />
+
+                    <RadioGroup
+                        android:id="@+id/compat_rdg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <RadioButton
+                            android:id="@+id/radio_noncompat_no"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:checked="true"
+                            style="@style/EditMedTitle"
+                            android:text="@string/no"
+                            android:textColor="#000" />
+                        <RadioButton
+                            android:id="@+id/radio_noncompat_yes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/EditMedTitle"
+                            android:text="@string/yes"
+                            android:textColor="#000" />
+                    </RadioGroup>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <Button
+                android:id="@+id/save_btn"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="205dp"
+                android:layout_height="58dp"
+                android:layout_gravity="bottom|center"
+                android:text="@string/save"
+                android:theme="@style/Facebook.Button"
+                android:layout_marginBottom="16dp"
+                android:layout_marginTop="16dp"/>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>
