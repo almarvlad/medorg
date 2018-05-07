@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:textSize="20sp"
-        android:textColor="#000"/>
+        android:textColor="#000"
+        android:clickable="true"/>
     <!--android:text="@string/timetable"-->
 
 </LinearLayout>

@@ -390,7 +390,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center">
 
-                <LinearLayout style="@style/EditMedCardsPadding">
+                <LinearLayout style="@style/EditMedCardsPadding"
+                    android:visibility="gone"
+                    android:id="@+id/compatibility">
                     <TextView
                         style="@style/EditMedTitle"
                         android:layout_height="wrap_content"

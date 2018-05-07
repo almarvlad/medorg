@@ -107,9 +107,9 @@ public class MainActivity extends AppCompatActivity
                 fTrans.replace(R.id.container, freport);
                 break;
             case R.id.menu_settings:
-                fTrans.replace(R.id.container, fsettings);
-//                Intent intent = new Intent(this, com.example.admin.medorg.Fragments.ScrollingActivity.class);
-//                startActivity(intent);
+                //fTrans.replace(R.id.container, fsettings);
+                Intent intent = new Intent(this, com.example.admin.medorg.Fragments.ScrollingActivity.class);
+                startActivity(intent);
                 break;
         }
         fTrans.commit();

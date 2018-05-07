@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.example.admin.medorg.Fragments.DatePickerfragment;
 import com.example.admin.medorg.Fragments.FragmentMeds;
 import com.example.admin.medorg.Room.AppDatabase;
+import com.example.admin.medorg.Room.DBDao;
 import com.example.admin.medorg.Room.UserMedicine;
 
 import java.text.DateFormat;
@@ -45,6 +46,8 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
     EditText editMedName;
     EditText editTimeFreq;
     public static final String EXTRA_REPLY = "com.example.android.wordlistsql.REPLY";
+    AppDatabase db = AppDatabase.getDatabase(this);
+    DBDao medDao = db.Dao();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +135,11 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
 
         editMedName = (EditText) findViewById(R.id.editMedName);
         editTimeFreq = (EditText) findViewById(R.id.editTimeFreq);
+        View compat = (View) findViewById(R.id.compatibility);
         final Button savebtn = (Button) findViewById(R.id.save_btn);
+
+        if (medDao.medsCount().size()>0)
+            compat.setVisibility(View.VISIBLE);
 
         savebtn.setOnClickListener(new View.OnClickListener() {
             @Override

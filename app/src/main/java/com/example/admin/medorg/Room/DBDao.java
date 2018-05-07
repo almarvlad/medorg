@@ -14,4 +14,7 @@ public interface DBDao {
 
     @Insert
     void insert(UserMedicine userMedicine);
+
+    @Query("SELECT * FROM medicals")
+    List<UserMedicine> medsCount();
 }

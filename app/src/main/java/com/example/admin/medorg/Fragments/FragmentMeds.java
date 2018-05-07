@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import com.example.admin.medorg.MedEdit;
 import com.example.admin.medorg.R;
 import com.example.admin.medorg.Room.AppDatabase;
+import com.example.admin.medorg.Room.DBDao;
 import com.example.admin.medorg.Room.MedicineViewModel;
 import com.example.admin.medorg.Room.UserMedicine;
 
@@ -50,6 +51,7 @@ public class FragmentMeds extends Fragment {
     private static final String TAG = "myLogs";
     private MedicineViewModel mMedicineViewModel;
     public static final int NEW_WORD_ACTIVITY_REQUEST_CODE = 1;
+
 
     public FragmentMeds() {
         // Required empty public constructor
