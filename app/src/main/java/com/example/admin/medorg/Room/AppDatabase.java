@@ -4,11 +4,12 @@ import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
-@Database(entities = {UserMedicine.class}, version = 1)
+@Database(entities = {UserMedicine.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract DBDao Dao();
 
@@ -20,6 +21,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             AppDatabase.class, "word_database")
+                            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
                             .allowMainThreadQueries()
                             .addCallback(sRoomDatabaseCallback)
                             .build();
@@ -53,4 +55,25 @@ public abstract class AppDatabase extends RoomDatabase {
             return null;
         }
     }
+
+    public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(final SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE medicals ADD COLUMN time_per,REAL;" +
+                    " course_start,LONG;" +
+                    " Duration,INTEGER;" +
+                    " Weekdays,VARCHAR(7);" +
+                    " Dose,REAL;" +
+                    " DoseForm,VARCHAR;" +
+                    " Instruct,TINYINT;" +
+                    " AddInstruct,VARCHAR(255);" +
+                    " IsActive,BOOLEAN DEFAULT 0 NOT NULL");
+        }
+    };
+    public static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(final SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE medicals ADD COLUMN timeType,BOOLEAN DEFAULT 0 NOT NULL");
+        }
+    };
 }

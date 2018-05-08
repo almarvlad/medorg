@@ -8,7 +8,7 @@ import java.util.List;
 
 public class MedRepo {
 
-    private DBDao mDBDao;
+    public DBDao mDBDao;
     private LiveData<List<UserMedicine>> mAllMeds;
 
     MedRepo(Application application) {

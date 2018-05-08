@@ -110,7 +110,7 @@ public class FragmentMeds extends Fragment {
             public void onClick(View view) {
                 Log.d(TAG, "onClick pressed!");
                 Intent intent = new Intent(getActivity(), com.example.admin.medorg.MedEdit.class);
-                startActivityForResult(intent, NEW_WORD_ACTIVITY_REQUEST_CODE);
+                startActivity(intent);
 
             }
         });
@@ -160,7 +160,6 @@ public class FragmentMeds extends Fragment {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-            UserMedicine med = new UserMedicine(data.getStringExtra(MedEdit.EXTRA_REPLY),25);
-            mMedicineViewModel.insert(med);
+
     }
 }
