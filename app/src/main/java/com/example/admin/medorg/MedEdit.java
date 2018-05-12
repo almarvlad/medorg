@@ -3,6 +3,7 @@ package com.example.admin.medorg;
 import android.app.DatePickerDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
@@ -32,16 +33,19 @@ import com.example.admin.medorg.Fragments.FragmentMeds;
 import com.example.admin.medorg.Room.AppDatabase;
 import com.example.admin.medorg.Room.DBDao;
 import com.example.admin.medorg.Room.MedicineViewModel;
+import com.example.admin.medorg.Room.NonCompatMeds;
 import com.example.admin.medorg.Room.UserMedicine;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDateSetListener{
 
     private static final String TAG = "MedEdit";
+    private static final String SM = "SAVE_MED";
     TextView beginCoursePicker;
     String[] weekdays_list;
     boolean[] checkedItems;
@@ -63,6 +67,7 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
 //    AppDatabase db = AppDatabase.getDatabase(this);
 //    DBDao medDao = db.Dao();
     private MedicineViewModel mMedicineViewModel;
+    long[] noncompatID;
 
     Calendar c = Calendar.getInstance();
     String num = ""; // для формирования строки с номерами дней недели
@@ -147,7 +152,7 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                                 String item = "";
                                 for (int i = 0; i < mSelectedItems.size(); i++) {
                                     item += weekdays_list[mSelectedItems.get(i)];
-                                    Log.d("SAVE_MED","bb "+(mSelectedItems.get(i)+1));
+                                    Log.d("SM","bb "+(mSelectedItems.get(i)+1));
                                     num += (mSelectedItems.get(i)+1);
                                     if (i != mSelectedItems.size()-1)
                                         item += ", ";
@@ -242,17 +247,18 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                     mDialogMeds.setPositiveButton("Выбрать", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            String item = "";
-                            for (int i = 0; i < mSelectedMeds.size(); i++) {
-                                item += medsarray[mSelectedMeds.get(i)];
-                                if (i != mSelectedMeds.size() - 1)
-                                    item += ", ";
-                            }
-                            Toast.makeText(getApplicationContext(),"лекарства: " + item, Toast.LENGTH_LONG).show();
-                            if (item == "") {
+                            if (mSelectedMeds.size()==0){
                                 RadioGroup rdg_compat = (RadioGroup) findViewById(R.id.compat_rdg);
                                 rdg_compat.check(R.id.radio_noncompat_no);
+                            } else {
+                                noncompatID = new long[mSelectedMeds.size()];
+                                List<UserMedicine> medsDB = mMedicineViewModel.getMedsAL();
+                                for (int i = 0; i < mSelectedMeds.size(); i++) {
+                                    noncompatID[i] = medsDB.get(mSelectedMeds.get(i)).getID();
+                                }
+                                Toast.makeText(getApplicationContext(),"лекарства: " + noncompatID.length, Toast.LENGTH_LONG).show();
                             }
+
                         }
                     });
                     mDialogMeds.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
@@ -261,6 +267,7 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                             dialog.dismiss();
                             RadioGroup rdg_compat = (RadioGroup) findViewById(R.id.compat_rdg);
                             rdg_compat.check(R.id.radio_noncompat_no);
+                            mSelectedMeds.clear();
                         }
                     });
                     AlertDialog mDialog2 = mDialogMeds.create();
@@ -274,14 +281,17 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
             @Override
             public void onClick(View v) {
                 Intent replyIntent = new Intent();
+                // если не добавлено название лекарства, то сохранение не происходит
                 if (TextUtils.isEmpty(editMedName.getText())) {
                     setResult(RESULT_CANCELED, replyIntent);
                 } else {
+                    // узнаём дни приёма
                     RadioGroup rdg_days = (RadioGroup) findViewById(R.id.days_rdg);
                     int wd = rdg_days.indexOfChild(findViewById(rdg_days.getCheckedRadioButtonId()));
                     if (wd == 0) {
                         num = "1234567";
                     }
+                    //узнаём время приёма
                     RadioGroup rdg_timetype = (RadioGroup) findViewById(R.id.time_rdg);
                     int tt = rdg_timetype.indexOfChild(findViewById(rdg_timetype.getCheckedRadioButtonId()));
                     boolean timetype;
@@ -293,14 +303,40 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                         timetype = true;
                         t = Float.parseFloat(editTimeInt.getText().toString());
                     }
-
+                    // узнаём инструкции
                     RadioGroup rdg_instr = (RadioGroup) findViewById(R.id.instruct_rdg);
                     byte instr = (byte) rdg_instr.indexOfChild(findViewById(rdg_instr.getCheckedRadioButtonId()));
+
+                    // добавляем новый объект-запись о лекарстве
                     UserMedicine med = new UserMedicine(editMedName.getText().toString(), t,
                             c.getTime().getTime(), timetype, num, Float.parseFloat(editDose.getText().toString()),
                             spinFormDose.getSelectedItem().toString(), instr, add_instr.getText().toString(),
                             daysCount);
-                    mMedicineViewModel.insert(med);
+                    //Log.d("SAVE_MED", ""+med.getID());
+                    mMedicineViewModel.insert(med, noncompatID);
+                    /*
+                    Log.d("SAVE_MED", "щас попытаемся получить последний ид");
+                    long lastAddedId = mMedicineViewModel.getLastId();
+                    Log.d("SAVE_MED", "last ID: "+ lastAddedId);
+                    /*
+                    Long lastAddedId = mMedicineViewModel.insert(med);
+*/
+                    //сохраняем id несовмеситмых лекарств
+
+                    //long lastAddedId = meds.get(meds.size()-1).getID();
+                    /*
+                    UserMedicine onemed;
+                    AppDatabase adb = AppDatabase.getDatabase(MedEdit.this);
+                    DBDao dao = adb.Dao();
+                    final List<UserMedicine> meds = dao.getAllMedsAL();
+                    Log.d("SAVE_MED", "medssize: "+ mMedicineViewModel.getMedsCount().length);
+                    for (int i = 0; i < mSelectedMeds.size(); i++) {
+                        onemed = meds.get(mSelectedMeds.get(i));
+                        Log.d("SAVE_MED", "onemed.getID: "+ onemed.getID());
+                        NonCompatMeds ncm = new NonCompatMeds(lastAddedId,onemed.getID());
+                        dao.addNoncompat(ncm);
+                        Log.d("SAVE_MED", ""+lastAddedId + " " + onemed.getID());
+                    }*/
                     Log.d("SAVE_MED", "name: " + med.getName() +
                             "\nperiod: " + med.getTimePer() +
                             "\nstartCourse: " + new Date(med.getCourseStart()) +

@@ -9,7 +9,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
-@Database(entities = {UserMedicine.class}, version = 3)
+@Database(entities = {UserMedicine.class, NonCompatMeds.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract DBDao Dao();
 

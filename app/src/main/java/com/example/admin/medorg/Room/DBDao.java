@@ -5,6 +5,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -12,9 +13,15 @@ public interface DBDao {
     @Query("SELECT * FROM medicals")
     LiveData<List<UserMedicine>> getAllMeds();
 
+    @Query("SELECT * FROM medicals")
+    List<UserMedicine> getAllMedsAL();
+
     @Insert
-    void insert(UserMedicine userMedicine);
+    long insert(UserMedicine userMedicine);
 
     @Query("SELECT med_name FROM medicals")
     String[] medsCount();
+
+    @Insert
+    void addNoncompat(NonCompatMeds noncompatMeds);
 }
