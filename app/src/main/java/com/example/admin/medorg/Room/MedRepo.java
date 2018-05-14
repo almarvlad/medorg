@@ -8,7 +8,6 @@ import android.util.Log;
 import java.util.List;
 
 public class MedRepo {
-
     public DBDao mDBDao;
     private LiveData<List<UserMedicine>> mAllMeds;
     public static Long res;
@@ -28,7 +27,6 @@ public class MedRepo {
     }
 
     private static class insertAsyncTask extends AsyncTask<UserMedicine, Void, Long> {
-
         private DBDao mAsyncTaskDao;
         private UserMedicine umed;
         private long[] nc;
@@ -37,7 +35,6 @@ public class MedRepo {
             mAsyncTaskDao = dao;
             this.umed = umed;
             this.nc = nonc;
-
         }
 
         @Override
@@ -50,11 +47,10 @@ public class MedRepo {
                 if (nc.length>0){ //точно, что этот список есть и его длина не равна 0
                     for (int i = 0; i < nc.length; i++) {
                         mAsyncTaskDao.addNoncompat(new NonCompatMeds(r,nc[i])); // добавляем в таблицу несовместимых лекарств связи
-                        Log.d("SAVE_MED","NC: "+r+ "; "+nc[i]);
+                        Log.d("SAVE_MED","NC: "+r+ "; "+nc[i]); // и выводим их в лог, для проверки
                     }
                 }
             }
-
             return r;
         }
 

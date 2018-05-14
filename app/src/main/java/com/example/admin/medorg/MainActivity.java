@@ -3,9 +3,6 @@ package com.example.admin.medorg;
 import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -108,7 +105,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.menu_settings:
                 //fTrans.replace(R.id.container, fsettings);
-                Intent intent = new Intent(this, com.example.admin.medorg.Fragments.ScrollingActivity.class);
+                Intent intent = new Intent(this, MedInfo.class);
                 startActivity(intent);
                 break;
         }

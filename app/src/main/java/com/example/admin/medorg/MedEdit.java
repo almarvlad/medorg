@@ -118,7 +118,6 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                                 });
                 //Создаем AlertDialog:
                 AlertDialog alertDialog = mDialogBuilder.create();
-
                 //и отображаем его:
                 alertDialog.show();
             }
@@ -276,7 +275,6 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
             });
         }
 
-
         savebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -352,8 +350,7 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem)
-    {
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case android.R.id.home:
                 onBackPressed();

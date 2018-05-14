@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.admin.medorg">
+    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="24" />
 
     <application
         android:allowBackup="true"
@@ -19,10 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MedInfo" />
         <activity android:name=".MedEdit" />
         <activity
-            android:name=".Fragments.ScrollingActivity"
+            android:name=".MedInfo"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>

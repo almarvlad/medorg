@@ -57,15 +57,6 @@ public class FragmentMeds extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FragmentMeds.
-     */
-    // TODO: Rename and change types and number of parameters
     public static FragmentMeds newInstance(String param1, String param2) {
         FragmentMeds fragment = new FragmentMeds();
         Bundle args = new Bundle();
@@ -87,19 +78,23 @@ public class FragmentMeds extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // связываем с файлом вёрстки
         View v = inflater.inflate(R.layout.fragment_meds, container, false);
 
         RecyclerView recyclerView = v.findViewById(R.id.recycler_meds);
-        final MedicineListAdapter adapter = new MedicineListAdapter(getActivity());
+        final MedicineListAdapter adapter = new MedicineListAdapter(getActivity()); // адаптер для recyclerview
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mMedicineViewModel = ViewModelProviders.of(this).get(MedicineViewModel.class);
+        /*
+        if (mMedicineViewModel.getMedsCount().length == 0) {
+            v.findViewById(R.id.no_meds).setVisibility(View.VISIBLE);
+        } */
         mMedicineViewModel.getAllMeds().observe(this, new Observer<List<UserMedicine>>() {
             @Override
             public void onChanged(@Nullable final List<UserMedicine> words) {
-                // Update the cached copy of the words in the adapter.
+                // обновить кэш-копию слов в репозитории
                 adapter.setWords(words);
             }
         });
@@ -108,10 +103,8 @@ public class FragmentMeds extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "onClick pressed!");
                 Intent intent = new Intent(getActivity(), com.example.admin.medorg.MedEdit.class);
                 startActivity(intent);
-
             }
         });
         return v;
@@ -123,7 +116,6 @@ public class FragmentMeds extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
-
     /*
     @Override
     public void onAttach(Context context) {
@@ -160,6 +152,5 @@ public class FragmentMeds extends Fragment {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
     }
 }

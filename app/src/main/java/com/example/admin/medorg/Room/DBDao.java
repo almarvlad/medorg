@@ -13,6 +13,12 @@ public interface DBDao {
     @Query("SELECT * FROM medicals")
     LiveData<List<UserMedicine>> getAllMeds();
 
+    @Query("SELECT * FROM medicals WHERE id = :medId")
+    UserMedicine getById(long medId);
+
+    @Query("SELECT * FROM noncompatible WHERE id_one = :id OR id_two = :id")
+    List<NonCompatMeds> getNoncompat(long id);
+
     @Query("SELECT * FROM medicals")
     List<UserMedicine> getAllMedsAL();
 

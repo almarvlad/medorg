@@ -11,14 +11,9 @@ public class MedicineViewModel extends AndroidViewModel {
 
     private MedRepo mRepository;
 
-    private LiveData<List<UserMedicine>> mAllMeds;
-
-    public List<UserMedicine> getMedsAL() {
-        return medsAL;
-    }
-
-    private List<UserMedicine> medsAL;
-    private String[] medsCount;
+    private LiveData<List<UserMedicine>> mAllMeds;  // LiveData
+    private List<UserMedicine> medsAL;              // лист самих записей о лекарствах
+    private String[] medsCount;                     // массив названий лекарств
 
     public MedicineViewModel (Application app) {
         super(app);
@@ -38,5 +33,9 @@ public class MedicineViewModel extends AndroidViewModel {
 
     public long getLastId () {
         return mRepository.res;
+    }
+
+    public List<UserMedicine> getMedsAL() {
+        return medsAL;
     }
 }

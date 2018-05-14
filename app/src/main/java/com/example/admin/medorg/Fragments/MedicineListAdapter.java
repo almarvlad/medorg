@@ -1,6 +1,7 @@
 package com.example.admin.medorg.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,43 +10,36 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.admin.medorg.R;
-import com.example.admin.medorg.Room.MedicineViewModel;
 import com.example.admin.medorg.Room.UserMedicine;
+import com.example.admin.medorg.MedInfo;
 
 import java.util.List;
 
 public class MedicineListAdapter extends RecyclerView.Adapter<MedicineListAdapter.MedicineViewHolder> {
-
-//    class MedicineViewHolder extends RecyclerView.ViewHolder {
-//        private final TextView medItemView;
-//
-//        private MedicineViewHolder(View itemView) {
-//            super(itemView);
-//            medItemView = itemView.findViewById(R.id.medname);
-//        }
-//    }
 
     public static class MedicineViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener  {
         private final TextView medItemView;
 
         public MedicineViewHolder(View v) {
             super(v);
-
             medItemView = (TextView) v.findViewById(R.id.medname);
             medItemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 itemClick(position);
+                Context context = v.getContext();
+                Intent infActivity = new Intent(context, MedInfo.class);
+                infActivity.putExtra("id", (long)medItemView.getTag());
+                Log.d("TAG", Long.toString((long)medItemView.getTag()));
+                context.startActivity(infActivity);
             }
         }
-
         private void itemClick(int position){
-            Log.d("TAG", "Click work");
+            Log.d("TAG", "Click work " + position);
         }
     }
 
@@ -65,6 +59,7 @@ public class MedicineListAdapter extends RecyclerView.Adapter<MedicineListAdapte
         if (mMeds != null) {
             UserMedicine current = mMeds.get(position);
             holder.medItemView.setText(current.getName());
+            holder.medItemView.setTag(current.getID());
         } else {
             // Covers the case of data not being ready yet.
             holder.medItemView.setText("No Word");
