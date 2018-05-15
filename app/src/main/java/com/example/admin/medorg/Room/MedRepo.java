@@ -67,7 +67,7 @@ public class MedRepo {
     }
 
     // удаление из словаря
-    private static class deleteMedAsyncTask extends AsyncTask<Void, Void, Void> {
+    private static class deleteMedAsyncTask extends AsyncTask<Void, Void, String> {
         private final DBDao mAsyncTaskDao;
         private long id;
 
@@ -77,12 +77,13 @@ public class MedRepo {
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
+            String r = mAsyncTaskDao.getById(id).getName();
             Log.d("MED_INFO", "Фоновый процесс по удалению из бд");
             mAsyncTaskDao.deleteMed(id);
             mAsyncTaskDao.deleteNoncompatMed(id);
             Log.d("MED_INFO", "Лекарство с id " + id + " удалено");
-            return null;
+            return r;
         }
     }
 }
