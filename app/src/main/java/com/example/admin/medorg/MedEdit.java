@@ -48,10 +48,12 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
     private static final String SM = "SAVE_MED";
     TextView beginCoursePicker;
     String[] weekdays_list;
+
     boolean[] checkedItems;
     boolean[] checkedMeds;
-    ArrayList<Integer> mSelectedItems = new ArrayList();  // Where we track the selected items
-    ArrayList<Integer> mSelectedMeds = new ArrayList();  // Where we track the selected items
+    ArrayList<Integer> mSelectedItems = new ArrayList();  // отмеченные дни недели
+    ArrayList<Integer> mSelectedMeds = new ArrayList();  // отмеченные несовместимые лекарства
+
     RadioButton weekdays;
     RadioButton noncompat;
     RadioButton fixedDays;
@@ -63,14 +65,12 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
     EditText editDose;
     EditText add_instr;
     Spinner spinFormDose;
-    public static final String EXTRA_REPLY = "com.example.android.wordlistsql.REPLY";
-//    AppDatabase db = AppDatabase.getDatabase(this);
-//    DBDao medDao = db.Dao();
+
     private MedicineViewModel mMedicineViewModel;
-    long[] noncompatID;
+    long[] noncompatID; // массив для хранения id лекарств, которые несовместимы с создаваемым лекарством
 
     Calendar c = Calendar.getInstance();
-    String num = ""; // для формирования строки с номерами дней недели
+    String num = ""; // для формирования строки с номерами дней недели // по умолчанию - все дни
     int daysCount = 0; // для хранения количества дней для фиксированного курса
 
     @Override
@@ -79,79 +79,83 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
         setContentView(R.layout.activity_med_edit);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true); // отображение кнопки "назад"
 
+        // ПРОДОЛЖИТЕЛЬНОСТЬ КУРСА
+        // если выбрано фиксированное кол-во дней, то создать новое диалоговое окно с вводом
         fixedDays = (RadioButton) findViewById(R.id.radio_numdays);
         fixedDays.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LayoutInflater li = LayoutInflater.from(getApplicationContext());
-                View promptsView = li.inflate(R.layout.fixed_days_course, null);
+                View promptsView = li.inflate(R.layout.fixed_days_course, null); // получаем лэйаут диалогового окна
                 //Создаем AlertDialog
                 AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder(MedEdit.this);
-
-                //Настраиваем prompt.xml для нашего AlertDialog:
+                //Настраиваем fixed_days_course.xml для нашего AlertDialog:
                 mDialogBuilder.setView(promptsView);
 
-                //Настраиваем отображение поля для ввода текста в открытом диалоге:
+                // получаем объект Edittext из диалог. окна
                 final EditText userInput = (EditText) promptsView.findViewById(R.id.fixeddayscourse);
+                if (daysCount != 0) {
+                    String s = Integer.toString(daysCount);
+                    userInput.setText(s);
+                }
                 //Настраиваем сообщение в диалоговом окне:
                 mDialogBuilder
                         .setTitle("Количество дней:")
                         .setCancelable(false)
-                        .setPositiveButton("OK",
+                        .setPositiveButton(getString(R.string.ok),
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,int id) {
                                         //Вводим текст и отображаем в строке ввода на основном экране:
                                         daysCount = Integer.parseInt(userInput.getText().toString());
-                                        fixedDays.setText("количество дней: " + daysCount);
+                                        String s = getString(R.string.numDays) + ": " + daysCount;
+                                        fixedDays.setText(s);
                                     }
                                 })
-                        .setNegativeButton("Отмена",
+                        .setNegativeButton(getString(R.string.cancel),
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,int id) {
                                         dialog.cancel();
-                                        RadioGroup rdg = (RadioGroup) findViewById(R.id.duration_rdg);
-                                        rdg.check(R.id.radio_continuous);
-                                        fixedDays.setText("количество дней");
+                                        if (daysCount == 0) {
+                                            RadioGroup rdg = (RadioGroup) findViewById(R.id.duration_rdg);
+                                            rdg.check(R.id.radio_continuous);
+                                            fixedDays.setText("количество дней");
+                                        }
                                     }
                                 });
-                //Создаем AlertDialog:
-                AlertDialog alertDialog = mDialogBuilder.create();
-                //и отображаем его:
-                alertDialog.show();
+                AlertDialog alertDialog = mDialogBuilder.create();  // Создаем AlertDialog
+                alertDialog.show();                                 // и отображаем его:
             }
         });
 
-        weekdays_list = getResources().getStringArray(R.array.weekdays);
-        checkedItems = new boolean[weekdays_list.length];
+        // ВЫБОР ДНЕЙ ПРИЁМА
+        weekdays_list = getResources().getStringArray(R.array.weekdays); // образуем массив из строковых ресурсов
+        checkedItems = new boolean[weekdays_list.length]; // для хранения состояний чекбоксов
         weekdays = (RadioButton) findViewById(R.id.radio_weekdays);
         weekdays.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder mDialogDays = new AlertDialog.Builder(MedEdit.this);
-                Log.d(TAG,"создан mDialogdays");
                 mDialogDays.setTitle("Выберите дни:")
                         .setMultiChoiceItems(weekdays_list, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                                 if (isChecked) {
-                                    // If the user checked the item, add it to the selected items
                                     mSelectedItems.add(which);
                                 } else if (mSelectedItems.contains(which)) {
-                                    // Else, if the item is already in the array, remove it
                                     mSelectedItems.remove(Integer.valueOf(which));
                                 }
                             }
                         })
                         .setCancelable(false)
-                        .setPositiveButton("Выбрать", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String item = "";
                                 for (int i = 0; i < mSelectedItems.size(); i++) {
                                     item += weekdays_list[mSelectedItems.get(i)];
-                                    Log.d("SM","bb "+(mSelectedItems.get(i)+1));
+                                    Log.d("SM",""+(mSelectedItems.get(i)+1));
                                     num += (mSelectedItems.get(i)+1);
                                     if (i != mSelectedItems.size()-1)
                                         item += ", ";
@@ -160,10 +164,9 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                                     RadioGroup rdg_days = (RadioGroup) findViewById(R.id.days_rdg);
                                     rdg_days.check(R.id.radio_everyday);
                                 } else weekdays.setText("определённые дни: " + item);
-
                             }
                         })
-                        .setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
@@ -174,9 +177,10 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                         });
                 AlertDialog mDialog = mDialogDays.create();
                 mDialog.show();
-
             }
         });
+
+        // выставляем текущую дату и вешаем на него обработчик нажатия
         String currDate = DateFormat.getDateInstance().format(c.getTime());
         beginCoursePicker = (TextView) findViewById(R.id.date);
         beginCoursePicker.setText(currDate);
@@ -188,6 +192,7 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
             }
         });
 
+        // настройка видимости для полей ввода времени приёма
         RadioGroup rdg_time = (RadioGroup) findViewById(R.id.time_rdg);
         final LinearLayout llFreq = (LinearLayout) findViewById(R.id.time_frequency);
         final LinearLayout llInt = (LinearLayout) findViewById(R.id.time_intervals);
@@ -220,10 +225,11 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
 
         mMedicineViewModel = ViewModelProviders.of(this).get(MedicineViewModel.class);
         if (mMedicineViewModel.getMedsCount().length>0) {
-            compat.setVisibility(View.VISIBLE);
-            final String[] medsarray = mMedicineViewModel.getMedsCount();
-            //weekdays_list = getResources().getStringArray(R.array.weekdays);
+            compat.setVisibility(View.VISIBLE); // если у пользователя уже есть лекарства, то можно настроить для них совместимость
+
+            final String[] medsarray = mMedicineViewModel.getMedsCount(); // получаем названия всех лекарств
             checkedMeds = new boolean[medsarray.length];
+
             noncompat = (RadioButton) findViewById(R.id.radio_noncompat_yes);
             noncompat.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -234,16 +240,14 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                         @Override
                         public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                             if (isChecked) {
-                                // If the user checked the item, add it to the selected items
                                 mSelectedMeds.add(which);
                             } else if (mSelectedMeds.contains(which)) {
-                                // Else, if the item is already in the array, remove it
                                 mSelectedMeds.remove(Integer.valueOf(which));
                             }
                         }
                     });
                     mDialogMeds.setCancelable(false);
-                    mDialogMeds.setPositiveButton("Выбрать", new DialogInterface.OnClickListener() {
+                    mDialogMeds.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (mSelectedMeds.size()==0){
@@ -255,12 +259,10 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                                 for (int i = 0; i < mSelectedMeds.size(); i++) {
                                     noncompatID[i] = medsDB.get(mSelectedMeds.get(i)).getID();
                                 }
-                                Toast.makeText(getApplicationContext(),"лекарства: " + noncompatID.length, Toast.LENGTH_LONG).show();
                             }
-
                         }
                     });
-                    mDialogMeds.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                    mDialogMeds.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
@@ -274,7 +276,7 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                 }
             });
         }
-
+        // сохранение данных лекарства
         savebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -286,7 +288,7 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                     // узнаём дни приёма
                     RadioGroup rdg_days = (RadioGroup) findViewById(R.id.days_rdg);
                     int wd = rdg_days.indexOfChild(findViewById(rdg_days.getCheckedRadioButtonId()));
-                    if (wd == 0) {
+                    if (wd == 0) { // если выбран переключатель "каждый день", то строка = "1234567"
                         num = "1234567";
                     }
                     //узнаём время приёма
@@ -295,13 +297,17 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                     boolean timetype;
                     float t;
                     if (tt == 0) {
-                        timetype = false;
+                        timetype = false; // N раз в день (частота)
                         t = Float.parseFloat(editTimeFreq.getText().toString());
                     } else {
-                        timetype = true;
+                        timetype = true;  // Каждые N часов (инервалы)
                         t = Float.parseFloat(editTimeInt.getText().toString());
                     }
                     // узнаём инструкции
+                    // 0 - до еды
+                    // 1 - во время
+                    // 2 - после еды
+                    // 3 - не важно
                     RadioGroup rdg_instr = (RadioGroup) findViewById(R.id.instruct_rdg);
                     byte instr = (byte) rdg_instr.indexOfChild(findViewById(rdg_instr.getCheckedRadioButtonId()));
 
@@ -310,31 +316,8 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                             c.getTime().getTime(), timetype, num, Float.parseFloat(editDose.getText().toString()),
                             spinFormDose.getSelectedItem().toString(), instr, add_instr.getText().toString(),
                             daysCount);
-                    //Log.d("SAVE_MED", ""+med.getID());
                     mMedicineViewModel.insert(med, noncompatID);
-                    /*
-                    Log.d("SAVE_MED", "щас попытаемся получить последний ид");
-                    long lastAddedId = mMedicineViewModel.getLastId();
-                    Log.d("SAVE_MED", "last ID: "+ lastAddedId);
-                    /*
-                    Long lastAddedId = mMedicineViewModel.insert(med);
-*/
-                    //сохраняем id несовмеситмых лекарств
 
-                    //long lastAddedId = meds.get(meds.size()-1).getID();
-                    /*
-                    UserMedicine onemed;
-                    AppDatabase adb = AppDatabase.getDatabase(MedEdit.this);
-                    DBDao dao = adb.Dao();
-                    final List<UserMedicine> meds = dao.getAllMedsAL();
-                    Log.d("SAVE_MED", "medssize: "+ mMedicineViewModel.getMedsCount().length);
-                    for (int i = 0; i < mSelectedMeds.size(); i++) {
-                        onemed = meds.get(mSelectedMeds.get(i));
-                        Log.d("SAVE_MED", "onemed.getID: "+ onemed.getID());
-                        NonCompatMeds ncm = new NonCompatMeds(lastAddedId,onemed.getID());
-                        dao.addNoncompat(ncm);
-                        Log.d("SAVE_MED", ""+lastAddedId + " " + onemed.getID());
-                    }*/
                     Log.d("SAVE_MED", "name: " + med.getName() +
                             "\nperiod: " + med.getTimePer() +
                             "\nstartCourse: " + new Date(med.getCourseStart()) +
@@ -372,5 +355,4 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
         setResult(RESULT_CANCELED);
         finish();
     }
-
 }

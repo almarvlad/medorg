@@ -47,11 +47,9 @@ public class FragmentMeds extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
     private static final String TAG = "myLogs";
     private MedicineViewModel mMedicineViewModel;
     public static final int NEW_WORD_ACTIVITY_REQUEST_CODE = 1;
-
 
     public FragmentMeds() {
         // Required empty public constructor
@@ -81,21 +79,20 @@ public class FragmentMeds extends Fragment {
         // связываем с файлом вёрстки
         View v = inflater.inflate(R.layout.fragment_meds, container, false);
 
-        RecyclerView recyclerView = v.findViewById(R.id.recycler_meds);
+        RecyclerView recyclerView = v.findViewById(R.id.recycler_meds); // наш список медикаментов
         final MedicineListAdapter adapter = new MedicineListAdapter(getActivity()); // адаптер для recyclerview
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mMedicineViewModel = ViewModelProviders.of(this).get(MedicineViewModel.class);
-        /*
+        /* нужно что-то прописать для того, чтобы плашка была, если нет медикаментов
         if (mMedicineViewModel.getMedsCount().length == 0) {
             v.findViewById(R.id.no_meds).setVisibility(View.VISIBLE);
         } */
         mMedicineViewModel.getAllMeds().observe(this, new Observer<List<UserMedicine>>() {
             @Override
             public void onChanged(@Nullable final List<UserMedicine> words) {
-                // обновить кэш-копию слов в репозитории
-                adapter.setWords(words);
+                adapter.setWords(words); // обновить кэш-копию слов в репозитории
             }
         });
 
@@ -103,6 +100,7 @@ public class FragmentMeds extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // переход на активити с созданием нового лекарства
                 Intent intent = new Intent(getActivity(), com.example.admin.medorg.MedEdit.class);
                 startActivity(intent);
             }
@@ -150,6 +148,7 @@ public class FragmentMeds extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    // а это нужно?
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }

@@ -26,8 +26,14 @@ public class MedRepo {
         new insertAsyncTask(mDBDao, userMed, noncompat).execute();
     }
 
+    public void deleteMed(long id) {
+        Log.d("MED_INFO", "вызван AsyncTask для удаления");
+        new deleteMedAsyncTask(mDBDao, id).execute();
+    }
+
+    // добавление в словарь
     private static class insertAsyncTask extends AsyncTask<UserMedicine, Void, Long> {
-        private DBDao mAsyncTaskDao;
+        private final DBDao mAsyncTaskDao;
         private UserMedicine umed;
         private long[] nc;
 
@@ -57,6 +63,26 @@ public class MedRepo {
         protected void onPostExecute(Long result) {
             res = result;
             Log.d("SAVE_MED", "res: "+result);
+        }
+    }
+
+    // удаление из словаря
+    private static class deleteMedAsyncTask extends AsyncTask<Void, Void, Void> {
+        private final DBDao mAsyncTaskDao;
+        private long id;
+
+        deleteMedAsyncTask(DBDao dao, long id) {
+            mAsyncTaskDao = dao;
+            this.id = id;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Log.d("MED_INFO", "Фоновый процесс по удалению из бд");
+            mAsyncTaskDao.deleteMed(id);
+            mAsyncTaskDao.deleteNoncompatMed(id);
+            Log.d("MED_INFO", "Лекарство с id " + id + " удалено");
+            return null;
         }
     }
 }

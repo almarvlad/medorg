@@ -11,9 +11,9 @@ import android.support.annotation.NonNull;
 
 @Database(entities = {UserMedicine.class, NonCompatMeds.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
-    public abstract DBDao Dao();
 
-    private static AppDatabase INSTANCE;
+    public abstract DBDao Dao();
+    private static AppDatabase INSTANCE; // объект базы данных, который должен оставаться в единственном экземпляре
 
     public static AppDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
@@ -42,7 +42,6 @@ public abstract class AppDatabase extends RoomDatabase {
             };
 
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
-
         private final DBDao mDao;
 
         PopulateDbAsync(AppDatabase db) {
@@ -51,11 +50,11 @@ public abstract class AppDatabase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(final Void... params) {
-
             return null;
         }
     }
 
+    // миграции - изменения в БД
     public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(final SupportSQLiteDatabase database) {

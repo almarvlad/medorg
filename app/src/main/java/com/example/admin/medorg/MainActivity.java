@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -66,6 +65,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    // "меню" нужно поменять
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -75,16 +75,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -104,9 +98,7 @@ public class MainActivity extends AppCompatActivity
                 fTrans.replace(R.id.container, freport);
                 break;
             case R.id.menu_settings:
-                //fTrans.replace(R.id.container, fsettings);
-                Intent intent = new Intent(this, MedInfo.class);
-                startActivity(intent);
+                fTrans.replace(R.id.container, fsettings);
                 break;
         }
         fTrans.commit();

@@ -1,6 +1,7 @@
 package com.example.admin.medorg.Room;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Dao;
@@ -30,4 +31,10 @@ public interface DBDao {
 
     @Insert
     void addNoncompat(NonCompatMeds noncompatMeds);
+
+    @Query("DELETE from medicals WHERE id = :id")
+    void deleteMed(long id);
+
+    @Query("DELETE from noncompatible WHERE id_one = :id OR id_two = :id")
+    void deleteNoncompatMed(long id);
 }

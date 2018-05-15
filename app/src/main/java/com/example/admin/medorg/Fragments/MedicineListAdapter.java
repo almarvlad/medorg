@@ -18,28 +18,25 @@ import java.util.List;
 public class MedicineListAdapter extends RecyclerView.Adapter<MedicineListAdapter.MedicineViewHolder> {
 
     public static class MedicineViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener  {
-        private final TextView medItemView;
+        private final TextView medItemView; // элемент-строка в recyclerview
 
         public MedicineViewHolder(View v) {
             super(v);
             medItemView = (TextView) v.findViewById(R.id.medname);
-            medItemView.setOnClickListener(this);
+            medItemView.setOnClickListener(this);   // вешаем обработчик клика на элемент списка
+                                                    // чтобы вызывалась страница с информацией о данной лекарстве
         }
 
         @Override
         public void onClick(View v) {
-            int position = getAdapterPosition();
+            int position = getAdapterPosition(); // позиция элемента в списке
             if (position != RecyclerView.NO_POSITION) {
-                itemClick(position);
-                Context context = v.getContext();
+                Context context = v.getContext(); // среда, в которой находится recyclerview - наш фрагмент
                 Intent infActivity = new Intent(context, MedInfo.class);
                 infActivity.putExtra("id", (long)medItemView.getTag());
-                Log.d("TAG", Long.toString((long)medItemView.getTag()));
+                Log.d("TAG", "id вызываемого лекарства" + Long.toString((long)medItemView.getTag()));
                 context.startActivity(infActivity);
             }
-        }
-        private void itemClick(int position){
-            Log.d("TAG", "Click work " + position);
         }
     }
 
@@ -50,10 +47,13 @@ public class MedicineListAdapter extends RecyclerView.Adapter<MedicineListAdapte
 
     @Override
     public MedicineViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // получаем элемент списка и вешаем на него холдер
         View itemView = mInflater.inflate(R.layout.med_row, parent, false);
         return new MedicineViewHolder(itemView);
     }
 
+//    This method internally calls onBindViewHolder(ViewHolder, int) to update the RecyclerView.
+//    ViewHolder contents with the item at the given position and also sets up some private fields to be used by RecyclerView.
     @Override
     public void onBindViewHolder(MedicineViewHolder holder, int position) {
         if (mMeds != null) {
@@ -68,7 +68,7 @@ public class MedicineListAdapter extends RecyclerView.Adapter<MedicineListAdapte
 
     void setWords(List<UserMedicine> meds){
         mMeds = meds;
-        notifyDataSetChanged();
+        notifyDataSetChanged(); // уведомлять слушателей об изменении данных
     }
 
     // getItemCount() is called many times, and when it is first called,

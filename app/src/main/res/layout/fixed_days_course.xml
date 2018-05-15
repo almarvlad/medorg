@@ -9,8 +9,8 @@
 
     <EditText
         android:id="@+id/fixeddayscourse"
+        style="@style/inputFieldStyle"
         android:layout_width="100dp"
-        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:inputType="number">
         <requestFocus />

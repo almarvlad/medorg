@@ -1,5 +1,6 @@
 package com.example.admin.medorg;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -9,12 +10,15 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.example.admin.medorg.Room.AppDatabase;
 import com.example.admin.medorg.Room.DBDao;
+import com.example.admin.medorg.Room.MedicineViewModel;
 import com.example.admin.medorg.Room.NonCompatMeds;
 import com.example.admin.medorg.Room.UserMedicine;
 
@@ -29,7 +33,7 @@ public class MedInfo extends AppCompatActivity {
     AppDatabase adb;
     DBDao dao;
 
-    TextView name, days, intervals, dose, instr, addInstr;
+    private MedicineViewModel mMedicineViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +59,8 @@ public class MedInfo extends AppCompatActivity {
 
         setMedInfo(med, nc);
 
+        mMedicineViewModel = ViewModelProviders.of(this).get(MedicineViewModel.class);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,10 +72,21 @@ public class MedInfo extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_med_info, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case R.id.action_delete:
+                Log.d("MED_INFO", "Нажата кнопка delete");
+                medDelete(medID);
                 return true;
             default:
                 return super.onOptionsItemSelected(menuItem);
@@ -149,9 +166,10 @@ public class MedInfo extends AppCompatActivity {
         else {
             res = "дни приёма: ";
             for (int i = 1; i <= 7; i++) {
-                if (weekdays.contains(Integer.toString(i)))
+                if (weekdays.contains(Integer.toString(i))) {
                     res += weekdays_list[i-1];
-                if (i < 7) res += ", ";
+                    if (i < 7) res += ", ";
+                }
             }
         }
         return res;
@@ -186,9 +204,14 @@ public class MedInfo extends AppCompatActivity {
             else ncID = nc.get(i).id_one;
             Log.d("MED_INFO", "id " + i + "-ого лекарства: " + ncID + " " + dao.getById(ncID).getName());
             res += dao.getById(ncID).getName();
-
             if (i < nc.size()-1) res += ", ";
         }
         return res;
+    }
+
+    public void medDelete(long id) {
+        Log.d("MED_INFO", "Вызван метод в ViewModel");
+        mMedicineViewModel.deletemed(id);
+        finish();
     }
 }

@@ -3,6 +3,7 @@ package com.example.admin.medorg.Room;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,5 +38,10 @@ public class MedicineViewModel extends AndroidViewModel {
 
     public List<UserMedicine> getMedsAL() {
         return medsAL;
+    }
+
+    public void deletemed(long id) {
+        Log.d("MED_INFO", "вызван метод в репозитории");
+        mRepository.deleteMed(id);
     }
 }
