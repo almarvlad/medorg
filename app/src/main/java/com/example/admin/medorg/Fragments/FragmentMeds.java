@@ -1,10 +1,13 @@
 package com.example.admin.medorg.Fragments;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -14,8 +17,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.admin.medorg.MedEdit;
 import com.example.admin.medorg.R;
 import com.example.admin.medorg.Room.AppDatabase;
+import com.example.admin.medorg.Room.DBDao;
+import com.example.admin.medorg.Room.MedicineViewModel;
 import com.example.admin.medorg.Room.UserMedicine;
 
 import java.util.ArrayList;
@@ -40,25 +47,14 @@ public class FragmentMeds extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
     private static final String TAG = "myLogs";
-    RecyclerView recMeds;
-    RecyclerView.Adapter recAdapter;
-//    ArrayList<UserMedicine> meds;
+    private MedicineViewModel mMedicineViewModel;
+    public static final int NEW_WORD_ACTIVITY_REQUEST_CODE = 1;
 
     public FragmentMeds() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FragmentMeds.
-     */
-    // TODO: Rename and change types and number of parameters
     public static FragmentMeds newInstance(String param1, String param2) {
         FragmentMeds fragment = new FragmentMeds();
         Bundle args = new Bundle();
@@ -80,34 +76,33 @@ public class FragmentMeds extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // связываем с файлом вёрстки
         View v = inflater.inflate(R.layout.fragment_meds, container, false);
 
-        recMeds = (RecyclerView) v.findViewById(R.id.recycler_meds);
-//        meds = new ArrayList<>();
-//        for (int i = 0; i < 10; i++) {
-//            UserMedicine med = new UserMedicine("name", 45);
-//            meds.add(med);
-//        }
+        RecyclerView recyclerView = v.findViewById(R.id.recycler_meds); // наш список медикаментов
+        final MedicineListAdapter adapter = new MedicineListAdapter(getActivity()); // адаптер для recyclerview
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        AppDatabase db = Room.databaseBuilder(getActivity().getApplicationContext(), AppDatabase.class, "production")
-                .allowMainThreadQueries()
-                .build();
-
-        List<UserMedicine> meds = db.Dao().getAllMeds();
-
-        recMeds.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recAdapter = new UserAdapter(meds);
-        recMeds.setAdapter(recAdapter);
+        mMedicineViewModel = ViewModelProviders.of(this).get(MedicineViewModel.class);
+        /* нужно что-то прописать для того, чтобы плашка была, если нет медикаментов
+        if (mMedicineViewModel.getMedsCount().length == 0) {
+            v.findViewById(R.id.no_meds).setVisibility(View.VISIBLE);
+        } */
+        mMedicineViewModel.getAllMeds().observe(this, new Observer<List<UserMedicine>>() {
+            @Override
+            public void onChanged(@Nullable final List<UserMedicine> words) {
+                adapter.setWords(words); // обновить кэш-копию слов в репозитории
+            }
+        });
 
         FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "onClick pressed!");
+                // переход на активити с созданием нового лекарства
                 Intent intent = new Intent(getActivity(), com.example.admin.medorg.MedEdit.class);
                 startActivity(intent);
-
             }
         });
         return v;
@@ -119,7 +114,6 @@ public class FragmentMeds extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
-
     /*
     @Override
     public void onAttach(Context context) {
@@ -152,5 +146,10 @@ public class FragmentMeds extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    // а это нужно?
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

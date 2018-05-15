@@ -18,7 +18,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <!-- НАЗВАНИЕ ЛЕКАРСТВА -->
@@ -40,6 +40,7 @@
                         android:id="@+id/editMedName"
                         style="@style/MedEditText"
                         android:layout_height="wrap_content"
+                        android:hint="@string/addMedNameHint"
                         android:inputType="textPersonName" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
@@ -93,19 +94,16 @@
 
                         <EditText
                             android:id="@+id/editTimeFreq"
+                            style="@style/inputFieldStyle"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:inputType="numberDecimal"
-                            android:numeric="decimal"
-                            android:text="2"
-                            android:textSize="24sp" />
+                            android:inputType="number"
+                            android:text="2" />
                         <TextView
                             style="@style/EditMedTitle"
                             android:textSize="24sp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text=" раз(а) в день"
+                            android:text="@string/timesAday"
                             android:textColor="#000" />
                     </LinearLayout>
                     <LinearLayout
@@ -120,22 +118,20 @@
                             android:textSize="24sp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Каждые "
+                            android:text="@string/every"
                             android:textColor="#000" />
                         <EditText
                             android:id="@+id/editTimeInt"
+                            style="@style/inputFieldStyle"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
                             android:inputType="number"
-                            android:text="2"
-                            android:textSize="24sp" />
+                            android:text="2" />
                         <TextView
                             style="@style/EditMedTitle"
                             android:textSize="24sp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text=" часа(ов)"
+                            android:text="@string/hours"
                             android:textColor="#000" />
                     </LinearLayout>
 
@@ -177,7 +173,8 @@
                             android:layout_weight="1"
                             android:gravity="center"
                             android:clickable="true"
-                            android:text="12 мая 2018 г."
+                            android:focusable="true"
+                            android:text="@string/addDate"
                             android:textColor="#000" />
                     </LinearLayout>
 
@@ -214,7 +211,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             style="@style/EditMedTitle"
-                            android:text="количество дней"
+                            android:text="@string/numDays"
                             android:textColor="#000"/>
                     </RadioGroup>
 
@@ -228,7 +225,7 @@
                     <TextView
                         style="@style/EditMedTitle"
                         android:layout_height="wrap_content"
-                        android:text="Дни приёма:"
+                        android:text="@string/days"
                         android:textColor="#000" />
                     <RadioGroup
                         android:id="@+id/days_rdg"
@@ -251,7 +248,7 @@
                             android:layout_weight="1"
                             android:clickable="true"
                             style="@style/EditMedTitle"
-                            android:text="определённые дни"
+                            android:text="@string/exactDays"
                             android:textColor="#000" />
                     </RadioGroup>
                 </LinearLayout>
@@ -295,14 +292,13 @@
                         android:layout_gravity="center">
                         <EditText
                             android:id="@+id/editDose"
+                            style="@style/inputFieldStyle"
                             android:layout_width="50dp"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
                             android:layout_weight="1"
                             android:text="1"
-                            android:textSize="24sp"
                             android:inputType="numberDecimal"/>
                         <Spinner
+                            android:id="@+id/spinDose"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:entries="@array/dose_list"
@@ -390,7 +386,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center">
 
-                <LinearLayout style="@style/EditMedCardsPadding">
+                <LinearLayout style="@style/EditMedCardsPadding"
+                    android:visibility="gone"
+                    android:id="@+id/compatibility">
                     <TextView
                         style="@style/EditMedTitle"
                         android:layout_height="wrap_content"
@@ -398,7 +396,7 @@
                     <TextView
                         style="@style/EditMedTitle"
                         android:layout_height="wrap_content"
-                        android:text="Есть ли несовмесимость с другими лекарствами?"
+                        android:text="@string/compatQuestion"
                         android:textColor="#000" />
 
                     <RadioGroup
