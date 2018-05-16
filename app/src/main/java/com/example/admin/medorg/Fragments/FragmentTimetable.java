@@ -1,11 +1,11 @@
 package com.example.admin.medorg.Fragments;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -14,7 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.admin.medorg.MainActivity;
+import com.example.admin.medorg.CircularViewPagerHandler;
 import com.example.admin.medorg.R;
 
 /**
@@ -37,11 +37,11 @@ public class FragmentTimetable extends Fragment {
 
     ViewGroup rootView;
 
-    private static final int NUM_PAGES = 5;
-    private ViewPager mPager;
-    private PagerAdapter mPagerAdapter;
+    private static final int NUM_PAGES = 10;
+    ViewPager pager;
+    PagerAdapter pagerAdapter;
 
-    private static final String TAG = "myLogs";
+    private static final String TAG = "TT_VIEWPAGER";
 
     private OnFragmentInteractionListener mListener;
 
@@ -83,17 +83,58 @@ public class FragmentTimetable extends Fragment {
         // Inflate the layout for this fragment
         rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_timetable, container, false);
-        //Instantiate a ViewPager and a PagerAdapter.
-        //Log.d(TAG, "onCreate" + rootView);
-        mPager = (ViewPager) rootView.findViewById(R.id.pager);
-        //Log.d(TAG, "mPager создан" + mPager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());
-        //Log.d(TAG, "mPagerAdapter создан " + mPagerAdapter);
-        mPager.setAdapter(mPagerAdapter);
-        Log.d(TAG, "адаптер сетнут ");
-        Log.d(TAG, "рутвью " + rootView);
-        //ломается при повторном открытии, нормик :сс
+
+        pager = (ViewPager) rootView.findViewById(R.id.pager);
+        pagerAdapter = new MyFragmentPagerAdapter(getChildFragmentManager());
+        pager.setAdapter(pagerAdapter);
+
+        pager.addOnPageChangeListener(new CircularViewPagerHandler(pager));
+        /*
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override // дает номер текущей отображенной страницы
+            public void onPageSelected(int position) {
+                Log.d(TAG, "onPageSelected, position = " + position);
+            }
+
+            @Override // дает нам представление о текущем значении скроллера при пролистывании
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+
+            @Override // сообщает нам о состоянии, в котором находится скроллер
+            // (SCROLL_STATE_IDLE – ничего не скролится,
+            // SCROLL_STATE_DRAGGING – пользователь «тащит» страницу,
+            // SCROLL_STATE_SETTLING – скроллер долистывает страницу до конца)
+            public void onPageScrollStateChanged(int state) { }
+        });
+        */
         return rootView;
+    }
+
+    private class MyFragmentPagerAdapter extends FragmentStatePagerAdapter {
+
+        public MyFragmentPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override // по номеру страницы нам надо вернуть фрагмент, используем наш метод newInstance
+        public Fragment getItem(int position) {
+            return DayPageFragment.newInstance(position);
+        }
+
+        @Override // здесь мы должны возвращать кол-во страниц, используем константу
+        public int getCount() {
+            return NUM_PAGES;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return "Title " + position;
+        }
+
+        @Override
+        public Parcelable saveState() {
+            // Do Nothing
+            return null;
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -102,7 +143,6 @@ public class FragmentTimetable extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
-
 
     /*
     @Override
@@ -145,12 +185,18 @@ public class FragmentTimetable extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
-            return new ScreenSlidePageFragment();
+            return new DayPageFragment();
         }
 
         @Override
         public int getCount() {
             return NUM_PAGES;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: Timetable");
     }
 }
