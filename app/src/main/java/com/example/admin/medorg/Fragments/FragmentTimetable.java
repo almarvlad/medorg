@@ -1,5 +1,6 @@
 package com.example.admin.medorg.Fragments;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -16,6 +17,13 @@ import android.view.ViewGroup;
 
 import com.example.admin.medorg.CircularViewPagerHandler;
 import com.example.admin.medorg.R;
+
+import java.util.Calendar;
+import java.util.Date;
+
+import devs.mulham.horizontalcalendar.HorizontalCalendar;
+import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
+import devs.mulham.horizontalcalendar.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,13 +45,14 @@ public class FragmentTimetable extends Fragment {
 
     ViewGroup rootView;
 
-    private static final int NUM_PAGES = 10;
+    private static int NUM_PAGES;
     ViewPager pager;
     PagerAdapter pagerAdapter;
 
     private static final String TAG = "TT_VIEWPAGER";
 
     private OnFragmentInteractionListener mListener;
+    Calendar startDate, endDate;
 
     public FragmentTimetable() {
         // Required empty public constructor
@@ -84,15 +93,42 @@ public class FragmentTimetable extends Fragment {
         rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_timetable, container, false);
 
+        /* starts before 1 month from now */
+        startDate = Calendar.getInstance();
+        startDate.add(Calendar.MONTH, -1);
+        /* ends after 1 month from now */
+        endDate = Calendar.getInstance();
+        endDate.add(Calendar.MONTH, 1);
+
+        final HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(rootView, R.id.calendarView)
+                .range(startDate, endDate)
+                .datesNumberOnScreen(3)
+                .configure()
+                    .showBottomText(false)
+                    .textColor(Color.parseColor("#727272"), Color.BLACK)    // default to (Color.LTGRAY, Color.WHITE).
+                .end()
+                .build();
+
+        NUM_PAGES = Utils.daysBetween(startDate, endDate);
+
         pager = (ViewPager) rootView.findViewById(R.id.pager);
         pagerAdapter = new MyFragmentPagerAdapter(getChildFragmentManager());
         pager.setAdapter(pagerAdapter);
+        pager.setCurrentItem(horizontalCalendar.positionOfDate(Calendar.getInstance()));
 
-        pager.addOnPageChangeListener(new CircularViewPagerHandler(pager));
-        /*
+        horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
+            @Override
+            public void onDateSelected(Calendar date, int position) {
+                pager.setCurrentItem(position);
+                Log.d(TAG, "выбрана дата: "  + date.get(Calendar.DAY_OF_MONTH) + " " + date.get(Calendar.MONTH) +
+                                "\nпозиция: " + position);
+            }
+        });
+
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override // дает номер текущей отображенной страницы
             public void onPageSelected(int position) {
+                horizontalCalendar.centerCalendarToPosition(position);
                 Log.d(TAG, "onPageSelected, position = " + position);
             }
 
@@ -105,7 +141,9 @@ public class FragmentTimetable extends Fragment {
             // SCROLL_STATE_SETTLING – скроллер долистывает страницу до конца)
             public void onPageScrollStateChanged(int state) { }
         });
-        */
+
+        horizontalCalendar.refresh();
+        Log.d(TAG, "позиция календаря: " + horizontalCalendar.getSelectedDatePosition());
         return rootView;
     }
 
