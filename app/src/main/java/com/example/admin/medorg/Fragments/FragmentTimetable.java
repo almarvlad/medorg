@@ -20,6 +20,7 @@ import com.example.admin.medorg.R;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
@@ -109,26 +110,27 @@ public class FragmentTimetable extends Fragment {
                 .end()
                 .build();
 
-        NUM_PAGES = Utils.daysBetween(startDate, endDate);
+        NUM_PAGES = Utils.daysBetween(startDate, endDate)+1;
+        Log.d(TAG, "кол-во дней " + NUM_PAGES);
 
+        // позиции в календаре начинаются с 1
+        // номера страниц начинаются с 0
         pager = (ViewPager) rootView.findViewById(R.id.pager);
         pagerAdapter = new MyFragmentPagerAdapter(getChildFragmentManager());
         pager.setAdapter(pagerAdapter);
-        pager.setCurrentItem(horizontalCalendar.positionOfDate(Calendar.getInstance()));
+        pager.setCurrentItem(horizontalCalendar.positionOfDate(Calendar.getInstance())-1);
 
         horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
             @Override
             public void onDateSelected(Calendar date, int position) {
-                pager.setCurrentItem(position);
-                Log.d(TAG, "выбрана дата: "  + date.get(Calendar.DAY_OF_MONTH) + " " + date.get(Calendar.MONTH) +
-                                "\nпозиция: " + position);
+                pager.setCurrentItem(position-1);
             }
         });
 
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override // дает номер текущей отображенной страницы
             public void onPageSelected(int position) {
-                horizontalCalendar.centerCalendarToPosition(position);
+                horizontalCalendar.centerCalendarToPosition(position + 1);
                 Log.d(TAG, "onPageSelected, position = " + position);
             }
 
@@ -236,5 +238,23 @@ public class FragmentTimetable extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: Timetable");
+    }
+
+    @Override
+    public  void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: Timetable");
+    }
+
+    @Override
+    public  void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: Timetable");
+    }
+
+    @Override
+    public  void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop : Timetable");
     }
 }

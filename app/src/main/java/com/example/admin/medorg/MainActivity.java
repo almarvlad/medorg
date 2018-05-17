@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.menu_timetable:
                 fTrans.replace(R.id.container, ftime);
-                fTrans.addToBackStack(null);
+                //fTrans.addToBackStack(null);
                 break;
             case R.id.menu_meds:
                 fTrans.replace(R.id.container, fmeds);
