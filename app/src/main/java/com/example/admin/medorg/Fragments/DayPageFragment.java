@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.admin.medorg.R;
@@ -51,6 +53,7 @@ public class DayPageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.timetable_day, null);
+        View cardview = inflater.inflate(R.layout.timetable_element, null);
 
         RecyclerView recyclerView = view.findViewById(R.id.timetable_page); // наш список cardview для графика приёма
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -62,7 +65,6 @@ public class DayPageFragment extends Fragment {
 
         final TimetableRVAdapter adapter = new TimetableRVAdapter(getContext(), exampleTime);
         recyclerView.setAdapter(adapter);
-
 
         return view;
     }

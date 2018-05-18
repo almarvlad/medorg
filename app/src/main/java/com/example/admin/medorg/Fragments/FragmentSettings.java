@@ -1,14 +1,24 @@
 package com.example.admin.medorg.Fragments;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.example.admin.medorg.R;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,10 +33,17 @@ public class FragmentSettings extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = "SETTIME";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    TextView beginDay, endDay;
+    LinearLayout begin, end;
+    Calendar beginTime, endTime;
+    Calendar time = Calendar.getInstance();
+    int hour, minute;
 
     private OnFragmentInteractionListener mListener;
 
@@ -65,7 +82,51 @@ public class FragmentSettings extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        View root = inflater.inflate(R.layout.fragment_settings, container, false);
+        beginDay = (TextView) root.findViewById(R.id.day_begin_text);
+        endDay = (TextView) root.findViewById(R.id.day_end_text);
+        begin = (LinearLayout) root.findViewById(R.id.day_begin);
+        end = (LinearLayout) root.findViewById(R.id.day_end);
+
+        begin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog tpd = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        SimpleDateFormat format1 = new SimpleDateFormat("HH:mm");
+                        Log.d(TAG, hourOfDay + ":" + minute);
+                        beginTime.set(Calendar.HOUR_OF_DAY,hourOfDay);
+                        beginTime.set(Calendar.MINUTE,minute);
+                        String formatted = format1.format(beginTime.getTime());
+                        beginDay.setText(formatted);
+                    }
+                }, 7, 0, true);
+                tpd.show();
+            }
+        });
+
+        end.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog tpd = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        SimpleDateFormat format1 = new SimpleDateFormat("HH:mm");
+                        Log.d(TAG, hourOfDay + ":" + minute);
+                        Calendar c = Calendar.getInstance();
+                        c.set(Calendar.HOUR_OF_DAY,hourOfDay);
+                        c.set(Calendar.MINUTE,minute);
+                        String formatted = format1.format(c.getTime());
+
+                        endDay.setText(formatted);
+                    }
+                }, 23, 0, true);
+                tpd.show();
+            }
+        });
+        return root;
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
