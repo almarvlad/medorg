@@ -38,18 +38,25 @@ public class FragmentSettings extends PreferenceFragmentCompat {
 
     @Override
     public void onDisplayPreferenceDialog(Preference preference) { // вызывается при создании диалогового фрагмента
+        // Try if the preference is one of our custom Preferences
         DialogFragment dialogFragment = null;
-        if (preference instanceof TimePreference) { // если вызвана настройка для времени
-            dialogFragment = new TimePreferenceDialogFragmentCompat(); // создаём новый диалоговый фрагмент
-            Bundle bundle = new Bundle(1);
-            bundle.putString("key", preference.getKey()); // Preference.getKey() возвращает ключ той настройки, дял которой было вызвано диалог. окно
-            Log.d(TAG, "bundle.putString(key, " + preference.getKey() + ")");
-            dialogFragment.setArguments(bundle);
+        if (preference instanceof TimePreference) {
+            // Create a new instance of TimePreferenceDialogFragment with the key of the related
+            // Preference
+            dialogFragment = TimePreferenceDialogFragmentCompat
+                    .newInstance(preference.getKey());
         }
+
+        // If it was one of our cutom Preferences, show its dialog
         if (dialogFragment != null) {
             dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(this.getFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");
+            dialogFragment.show(this.getFragmentManager(),
+                    "android.support.v7.preference" +
+                            ".PreferenceFragment.DIALOG");
         }
-        else { super.onDisplayPreferenceDialog(preference); }
+        // Could not be handled here. Try with the super method.
+        else {
+            super.onDisplayPreferenceDialog(preference);
+        }
     }
 }

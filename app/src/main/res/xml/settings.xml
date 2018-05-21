@@ -2,13 +2,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <com.example.admin.medorg.Fragments.TimePreference
         android:key="day_begin"
-        android:defaultValue="06:00"
+        android:defaultValue="360"
         android:summary="06:00"
-        android:title="Начало дня" />
+        android:title="Начало дня"/>
 
     <com.example.admin.medorg.Fragments.TimePreference
         android:key="day_end"
-        android:defaultValue="22:00"
+        android:defaultValue="1320"
         android:summary="22:00"
         android:title="Конец дня" />
 

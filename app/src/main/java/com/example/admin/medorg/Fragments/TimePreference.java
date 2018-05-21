@@ -3,69 +3,68 @@ package com.example.admin.medorg.Fragments;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.preference.DialogPreference;
+import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Log;
 
+import com.example.admin.medorg.R;
+
+import java.util.Calendar;
+import java.util.Date;
+
 public class TimePreference extends DialogPreference {
+    private int mTime;
+    private int mDialogLayoutResId = R.layout.pref_dialog_time;
     private static final String TAG = "TimePreference";
-    public int hour = 0;
-    public int minute = 0;
 
-
-    public static int parseHour(String value) { //выделяем час дня из строки
-        try {
-            String[] time = value.split(":");
-            return (Integer.parseInt(time[0]));
-        }
-        catch (Exception e) {
-            return 0;
-        }
+    public TimePreference(Context context) {
+        this(context, null);
     }
-
-    public static int parseMinute(String value) { // выделяем минуты из строки
-        try {
-            String[] time = value.split(":");
-            return (Integer.parseInt(time[1]));
-        }
-        catch (Exception e) {
-            return 0;
-        }
-    }
-
-    public static String timeToString(int h, int m) {
-        return String.format("%02d", h) + ":" + String.format("%02d", m);
-    }
-
     public TimePreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, R.attr.dialogPreferenceStyle);
+    }
+    public TimePreference(Context context, AttributeSet attrs,
+                          int defStyleAttr) {
+        this(context, attrs, defStyleAttr, defStyleAttr);
+    }
+    public TimePreference(Context context, AttributeSet attrs,
+                          int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+    }
+
+    public int getTime() {
+        Log.d(TAG, "getTime in TimePreference");
+        return mTime;
+    }
+    public void setTime(int time) {
+        Log.d(TAG, "setTime in TimePreference");
+        mTime = time;
+        // Save to Shared Preferences
+        persistInt(time);
+        String hour = (Integer.toString(time / 60).length()< 2) ? "0" + Integer.toString(time / 60) : Integer.toString(time / 60);
+        String min = (Integer.toString(time % 60).length()< 2) ? "0" + Integer.toString(time % 60) : Integer.toString(time % 60);
+        Log.d(TAG, hour + ":" + min);
+        setSummary(hour + ":" + min);
     }
 
     @Override
     protected Object onGetDefaultValue(TypedArray a, int index) {
         Log.d(TAG, "onGetDefaultValue in TimePreference");
-        Log.d(TAG, "index in TypedArray: " + index);
-        return a.getString(index);
+        // Default value from attribute. Fallback value is set to 0.
+        return a.getInt(index, 0);
+    }
+    @Override
+    protected void onSetInitialValue(boolean restorePersistedValue,
+                                     Object defaultValue) {
+        // Read the value. Use the default value if it is not possible.
+        Log.d(TAG, "onSetInitialValue in TimePreference");
+        setTime(restorePersistedValue ?
+                getPersistedInt(mTime) : (int) defaultValue);
     }
 
     @Override
-    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
-        Log.d(TAG, "onSetInitialValue in TimePreference");
-        String value;
-        if (restoreValue) {
-            if (defaultValue == null)
-                value = getPersistedString("00:00");
-            else value = getPersistedString(defaultValue.toString());
-        }
-        else {
-            value = defaultValue.toString();
-        }
-        hour = parseHour(value);
-        minute = parseMinute(value);
-        Log.d(TAG, hour + ":" + minute);
-    }
-
-    public void persistStringValue(String value) {
-        Log.d(TAG, "persistStringValue in TimePreference");
-        persistString(value);
+    public int getDialogLayoutResource() {
+        Log.d(TAG, " getDialogLayoutResource in TimePreference");
+        return mDialogLayoutResId;
     }
 }
