@@ -71,6 +71,22 @@
         <item>воскресенье</item>
     </string-array>
 
+    <string-array name="meal_count_array">
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </string-array>
+
+    <string-array name="meal_count_values">
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </string-array>
+
     <string name="title_activity_scrolling">ScrollingActivity</string>
     <string name="no_meds">Нажмите + для добавления лекарства</string>
     <string name="info_time_title">Время приёма</string>

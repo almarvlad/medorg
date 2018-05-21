@@ -1,9 +1,8 @@
 package com.example.admin.medorg;
 
-import android.content.Intent;
-import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -14,8 +13,8 @@ import android.view.MenuItem;
 
 import com.example.admin.medorg.Fragments.FragmentMeds;
 import com.example.admin.medorg.Fragments.FragmentReport;
-import com.example.admin.medorg.Fragments.FragmentSettings;
 import com.example.admin.medorg.Fragments.FragmentTimetable;
+import com.example.admin.medorg.Fragments.FragmentSettings;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -24,7 +23,6 @@ public class MainActivity extends AppCompatActivity
     FragmentTimetable ftime;
     FragmentMeds fmeds;
     FragmentReport freport;
-    FragmentSettings fsettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +44,10 @@ public class MainActivity extends AppCompatActivity
         ftime = new FragmentTimetable();
         fmeds = new FragmentMeds();
         freport = new FragmentReport();
-        fsettings = new FragmentSettings();
 
         // чтобы первоначально отображался экран "График приёма"
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.container, ftime).commit();
-
         }
     }
 
@@ -99,7 +95,7 @@ public class MainActivity extends AppCompatActivity
                 fTrans.replace(R.id.container, freport);
                 break;
             case R.id.menu_settings:
-                fTrans.replace(R.id.container, fsettings);
+                fTrans.replace(R.id.container, new FragmentSettings());
                 break;
         }
         fTrans.commit();
