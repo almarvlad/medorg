@@ -3,7 +3,7 @@ package com.example.admin.medorg;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -23,8 +23,9 @@ import com.example.admin.medorg.Room.NonCompatMeds;
 import com.example.admin.medorg.Room.UserMedicine;
 
 import java.util.List;
+import java.util.Locale;
 
-public class MedInfo extends AppCompatActivity {
+public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitListener{
     private long medID;
     private UserMedicine med;
     private List<NonCompatMeds> nc;
@@ -33,12 +34,16 @@ public class MedInfo extends AppCompatActivity {
     AppDatabase adb;
     DBDao dao;
 
+    private TextToSpeech mTTS;
+    private FloatingActionButton fab;
+
     private MedicineViewModel mMedicineViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_med_info);
+        mTTS = new TextToSpeech(this, this);
         weekdays_list = getResources().getStringArray(R.array.weekdays);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -61,12 +66,12 @@ public class MedInfo extends AppCompatActivity {
 
         mMedicineViewModel = ViewModelProviders.of(this).get(MedicineViewModel.class);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(View v) {
+                String text = med.getName();
+                mTTS.speak(text, TextToSpeech.QUEUE_FLUSH, null);
             }
         });
     }
@@ -213,5 +218,27 @@ public class MedInfo extends AppCompatActivity {
         Log.d("MED_INFO", "Вызван метод в ViewModel");
         mMedicineViewModel.deletemed(id);
         finish();
+    }
+
+    @Override
+    public void onInit(int status) {
+        // TODO Auto-generated method stub
+        if (status == TextToSpeech.SUCCESS) {
+
+            Locale locale = new Locale("ru");
+
+            int result = mTTS.setLanguage(locale);
+            //int result = mTTS.setLanguage(Locale.getDefault());
+
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "Извините, этот язык не поддерживается");
+            } else {
+                fab.setEnabled(true);
+            }
+
+        } else {
+            Log.e("TTS", "Ошибка!");
+        }
     }
 }
