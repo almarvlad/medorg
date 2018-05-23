@@ -1,21 +1,23 @@
 package com.example.admin.medorg;
 
-import android.content.Intent;
-import android.support.v4.app.FragmentTransaction;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.admin.medorg.Fragments.FragmentMeds;
 import com.example.admin.medorg.Fragments.FragmentReport;
-import com.example.admin.medorg.Fragments.FragmentSettings;
 import com.example.admin.medorg.Fragments.FragmentTimetable;
+import com.example.admin.medorg.Fragments.FragmentSettings;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -48,10 +50,18 @@ public class MainActivity extends AppCompatActivity
         freport = new FragmentReport();
         fsettings = new FragmentSettings();
 
+        /*
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("day_begin", 360);
+        editor.putInt("day_end", 1320);
+        editor.putString("meal_count", "3");
+        editor.commit();
+        */
+
         // чтобы первоначально отображался экран "График приёма"
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.container, ftime).commit();
-
         }
     }
 
@@ -90,6 +100,7 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.menu_timetable:
                 fTrans.replace(R.id.container, ftime);
+                //fTrans.addToBackStack(null);
                 break;
             case R.id.menu_meds:
                 fTrans.replace(R.id.container, fmeds);

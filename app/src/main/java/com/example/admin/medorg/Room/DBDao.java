@@ -20,8 +20,8 @@ public interface DBDao {
     @Query("SELECT * FROM noncompatible WHERE id_one = :id OR id_two = :id")
     List<NonCompatMeds> getNoncompat(long id);
 
-    @Query("SELECT * FROM medicals")
-    List<UserMedicine> getAllMedsAL();
+    @Query("SELECT * FROM medicals WHERE isActive=1")
+    ArrayList<UserMedicine> getActiveMeds();
 
     @Insert
     long insert(UserMedicine userMedicine);

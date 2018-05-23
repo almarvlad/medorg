@@ -1,10 +1,10 @@
 package com.example.admin.medorg.Fragments;
 
-import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
@@ -14,8 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.admin.medorg.MainActivity;
 import com.example.admin.medorg.R;
+
+import java.util.Calendar;
+
+import devs.mulham.horizontalcalendar.HorizontalCalendar;
+import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
+import devs.mulham.horizontalcalendar.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,13 +42,14 @@ public class FragmentTimetable extends Fragment {
 
     ViewGroup rootView;
 
-    private static final int NUM_PAGES = 5;
-    private ViewPager mPager;
-    private PagerAdapter mPagerAdapter;
+    private static int NUM_PAGES;
+    ViewPager pager;
+    PagerAdapter pagerAdapter;
 
-    private static final String TAG = "myLogs";
+    private static final String TAG = "TT_VIEWPAGER";
 
     private OnFragmentInteractionListener mListener;
+    Calendar startDate, endDate;
 
     public FragmentTimetable() {
         // Required empty public constructor
@@ -83,17 +89,88 @@ public class FragmentTimetable extends Fragment {
         // Inflate the layout for this fragment
         rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_timetable, container, false);
-        //Instantiate a ViewPager and a PagerAdapter.
-        //Log.d(TAG, "onCreate" + rootView);
-        mPager = (ViewPager) rootView.findViewById(R.id.pager);
-        //Log.d(TAG, "mPager создан" + mPager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());
-        //Log.d(TAG, "mPagerAdapter создан " + mPagerAdapter);
-        mPager.setAdapter(mPagerAdapter);
-        Log.d(TAG, "адаптер сетнут ");
-        Log.d(TAG, "рутвью " + rootView);
-        //ломается при повторном открытии, нормик :сс
+
+        /* starts before 1 month from now */
+        startDate = Calendar.getInstance();
+        startDate.add(Calendar.MONTH, -1);
+        /* ends after 1 month from now */
+        endDate = Calendar.getInstance();
+        endDate.add(Calendar.MONTH, 1);
+
+        final HorizontalCalendar horizontalCalendar = new HorizontalCalendar.Builder(rootView, R.id.calendarView)
+                .range(startDate, endDate)
+                .datesNumberOnScreen(3)
+                .configure()
+                    .showBottomText(false)
+                    .textColor(Color.parseColor("#727272"), Color.BLACK)    // default to (Color.LTGRAY, Color.WHITE).
+                .end()
+                .build();
+
+        NUM_PAGES = Utils.daysBetween(startDate, endDate)+1;
+        Log.d(TAG, "кол-во дней " + NUM_PAGES);
+
+        // позиции в календаре начинаются с 1
+        // номера страниц начинаются с 0
+        pager = (ViewPager) rootView.findViewById(R.id.pager);
+        pagerAdapter = new MyFragmentPagerAdapter(getChildFragmentManager());
+        pager.setAdapter(pagerAdapter);
+        pager.setCurrentItem(horizontalCalendar.positionOfDate(Calendar.getInstance())-1);
+
+        horizontalCalendar.setCalendarListener(new HorizontalCalendarListener() {
+            @Override
+            public void onDateSelected(Calendar date, int position) {
+                pager.setCurrentItem(position-1);
+            }
+        });
+
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override // дает номер текущей отображенной страницы
+            public void onPageSelected(int position) {
+                horizontalCalendar.centerCalendarToPosition(position + 1);
+                Log.d(TAG, "onPageSelected, position = " + position);
+            }
+
+            @Override // дает нам представление о текущем значении скроллера при пролистывании
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+
+            @Override // сообщает нам о состоянии, в котором находится скроллер
+            // (SCROLL_STATE_IDLE – ничего не скролится,
+            // SCROLL_STATE_DRAGGING – пользователь «тащит» страницу,
+            // SCROLL_STATE_SETTLING – скроллер долистывает страницу до конца)
+            public void onPageScrollStateChanged(int state) { }
+        });
+
+        horizontalCalendar.refresh();
+        Log.d(TAG, "позиция календаря: " + horizontalCalendar.getSelectedDatePosition());
         return rootView;
+    }
+
+    private class MyFragmentPagerAdapter extends FragmentStatePagerAdapter {
+
+        public MyFragmentPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override // по номеру страницы нам надо вернуть фрагмент, используем наш метод newInstance
+        public Fragment getItem(int position) {
+            return DayPageFragment.newInstance(position);
+        }
+
+        @Override // здесь мы должны возвращать кол-во страниц, используем константу
+        public int getCount() {
+            return NUM_PAGES;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return "Title " + position;
+        }
+
+        @Override
+        public Parcelable saveState() {
+            // Do Nothing
+            return null;
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -102,7 +179,6 @@ public class FragmentTimetable extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
-
 
     /*
     @Override
@@ -145,12 +221,36 @@ public class FragmentTimetable extends Fragment {
 
         @Override
         public Fragment getItem(int position) {
-            return new ScreenSlidePageFragment();
+            return new DayPageFragment();
         }
 
         @Override
         public int getCount() {
             return NUM_PAGES;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: Timetable");
+    }
+
+    @Override
+    public  void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: Timetable");
+    }
+
+    @Override
+    public  void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: Timetable");
+    }
+
+    @Override
+    public  void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop : Timetable");
     }
 }
