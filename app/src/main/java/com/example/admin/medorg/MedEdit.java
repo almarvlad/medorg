@@ -315,7 +315,7 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                     UserMedicine med = new UserMedicine(editMedName.getText().toString(), t,
                             c.getTime().getTime(), timetype, num, Float.parseFloat(editDose.getText().toString()),
                             spinFormDose.getSelectedItem().toString(), instr, add_instr.getText().toString(),
-                            daysCount);
+                            daysCount, true);
                     mMedicineViewModel.insert(med, noncompatID);
 
                     Log.d("SAVE_MED", "name: " + med.getName() +

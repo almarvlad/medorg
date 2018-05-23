@@ -1,5 +1,6 @@
 package com.example.admin.medorg;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -7,7 +8,9 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity
     FragmentTimetable ftime;
     FragmentMeds fmeds;
     FragmentReport freport;
+    FragmentSettings fsettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,16 @@ public class MainActivity extends AppCompatActivity
         ftime = new FragmentTimetable();
         fmeds = new FragmentMeds();
         freport = new FragmentReport();
+        fsettings = new FragmentSettings();
+
+        /*
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("day_begin", 360);
+        editor.putInt("day_end", 1320);
+        editor.putString("meal_count", "3");
+        editor.commit();
+        */
 
         // чтобы первоначально отображался экран "График приёма"
         if (savedInstanceState == null) {
@@ -95,7 +109,7 @@ public class MainActivity extends AppCompatActivity
                 fTrans.replace(R.id.container, freport);
                 break;
             case R.id.menu_settings:
-                fTrans.replace(R.id.container, new FragmentSettings());
+                fTrans.replace(R.id.container, fsettings);
                 break;
         }
         fTrans.commit();

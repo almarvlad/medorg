@@ -1,4 +1,4 @@
-package com.example.admin.medorg.Fragments;
+package com.example.admin.medorg;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -56,10 +56,8 @@ public class TimePreference extends DialogPreference {
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue,
                                      Object defaultValue) {
-        // Read the value. Use the default value if it is not possible.
         Log.d(TAG, "onSetInitialValue in TimePreference");
-        setTime(restorePersistedValue ?
-                getPersistedInt(mTime) : (int) defaultValue);
+        setTime(restorePersistedValue ? getPersistedInt(mTime) : (int) defaultValue);
     }
 
     @Override

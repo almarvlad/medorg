@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <com.example.admin.medorg.Fragments.TimePreference
+    <com.example.admin.medorg.TimePreference
         android:key="day_begin"
         android:defaultValue="360"
         android:summary="06:00"
         android:title="Начало дня"/>
 
-    <com.example.admin.medorg.Fragments.TimePreference
+    <com.example.admin.medorg.TimePreference
         android:key="day_end"
         android:defaultValue="1320"
         android:summary="22:00"
@@ -18,6 +18,7 @@
         android:summary="%s"
         android:entries="@array/meal_count_array"
         android:entryValues="@array/meal_count_array"
+        android:defaultValue="3"
         android:dialogTitle="Выберите количество приёмов пищи в день" >
     </ListPreference>
 </PreferenceScreen>

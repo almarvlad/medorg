@@ -13,7 +13,7 @@ import java.util.Date;
 public class UserMedicine {
     public UserMedicine(String name, float timePer, long courseStart,
                         boolean timeType, String weekdays, float dose, String doseForm,
-                        byte instruct, String addInstruct, int duration) {
+                        byte instruct, String addInstruct, int duration, boolean active) {
         this.name = name;
         this.timePer = timePer;
         this.courseStart = courseStart;
@@ -24,6 +24,7 @@ public class UserMedicine {
         this.instruct = instruct;
         this.addInstruct = addInstruct;
         this.duration = duration;
+        this.isActive = active;
     }
 
     @PrimaryKey(autoGenerate = true)
