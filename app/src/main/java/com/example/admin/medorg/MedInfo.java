@@ -120,20 +120,20 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
         textView.setText(med.getDose() + " " + med.getDoseForm());
 
         View i = findViewById(R.id.info_block_instruct);
-        Log.d("MED_INFO", ""+med.getAddInstruct().equals(""));
         if (med.getInstruct()==3 && med.getAddInstruct().equals("")) // если не важна сочетаемость с пищей и нет доп инструкций
             i.setVisibility(View.GONE);                         // тогда убираем блок с инструкциями
         else {
-            textView = (TextView) findViewById(R.id.info_food_instruct);
+            TextView textViewFood = (TextView) findViewById(R.id.info_food_instruct);
             // если есть сочетаемость с пищей
-            if (med.getInstruct()<3)
-                textView.setText(setFoodInstructInfo(med.getInstruct()));
-            else textView.setVisibility(View.GONE);
+            if (med.getInstruct()<3) {
+                textViewFood.setText(setFoodInstructInfo(med.getInstruct()));
+            }
+            else textViewFood.setVisibility(View.GONE);
             // если есть доп инструкции
+            textView = (TextView) findViewById(R.id.info_add_insctruct);
             if (med.getAddInstruct().equals(""))
                 textView.setVisibility(View.GONE);
             else {
-                textView = (TextView) findViewById(R.id.info_add_insctruct);
                 textView.setText(med.getAddInstruct());
             }
         }
@@ -181,6 +181,7 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
     }
 
     public String setFoodInstructInfo(byte instr){
+        Log.d("MED_INFO", "setFoodInstructInfo " + instr);
         String res;
         switch (instr) {
             case 0:

@@ -5,17 +5,24 @@ import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.admin.medorg.MedEdit;
+import com.example.admin.medorg.TimetableMaker;
+
 import java.util.List;
 
 public class MedRepo {
     public DBDao mDBDao;
     private LiveData<List<UserMedicine>> mAllMeds;
     public static Long res;
+    TimetableMaker ttmaker;
+    private static final String TAG = "SET_PRIORITY";
+
 
     MedRepo(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         mDBDao = db.Dao();
         mAllMeds = mDBDao.getAllMeds();
+        ttmaker = new TimetableMaker(application);
     }
 
     LiveData<List<UserMedicine>> getAllMeds() {
@@ -23,7 +30,7 @@ public class MedRepo {
     }
 
     public void insert (UserMedicine userMed, long[] noncompat) {
-        new insertAsyncTask(mDBDao, userMed, noncompat).execute();
+        new insertAsyncTask(mDBDao, userMed, noncompat, ttmaker).execute();
     }
 
     public void deleteMed(long id) {
@@ -36,11 +43,13 @@ public class MedRepo {
         private final DBDao mAsyncTaskDao;
         private UserMedicine umed;
         private long[] nc;
+        private TimetableMaker ttMaker;
 
-        insertAsyncTask(DBDao dao, UserMedicine umed, long[] nonc) {
+        insertAsyncTask(DBDao dao, UserMedicine umed, long[] nonc, TimetableMaker tm) {
             mAsyncTaskDao = dao;
             this.umed = umed;
             this.nc = nonc;
+            ttMaker = tm;
         }
 
         @Override
@@ -48,6 +57,7 @@ public class MedRepo {
             Long r = mAsyncTaskDao.insert(umed);
             res = r;
             Log.d("SAVE_MED", "last id: "+r);
+            Log.d(TAG, "Saving med info in background ...");
 
             if (nc != null) { //если есть список несовместимых лекарств
                 if (nc.length>0){ //точно, что этот список есть и его длина не равна 0
@@ -62,6 +72,8 @@ public class MedRepo {
 
         protected void onPostExecute(Long result) {
             res = result;
+            Log.d(TAG, "Call SetPriority method ...");
+            ttMaker.setPriority();
             Log.d("SAVE_MED", "res: "+result);
         }
     }
