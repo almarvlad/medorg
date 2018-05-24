@@ -27,12 +27,16 @@ public class UserMedicine {
         this.isActive = active;
     }
 
+    public void setID(@NonNull int ID) {
+        this.ID = ID;
+    }
+
     @PrimaryKey(autoGenerate = true)
     @NonNull
     @ColumnInfo(name = "id")
-    private long ID;
+    private int ID;
 
-    public long getID(){
+    public int getID(){
         return this.ID;
     }
 
@@ -139,10 +143,6 @@ public class UserMedicine {
     }
 
     private boolean timeType;
-
-    public void setID(@NonNull long ID) {
-        this.ID = ID;
-    }
 
     public String getName() {
         return name;

@@ -19,7 +19,8 @@ public class TimetableMaker {
     final int stInterval = 30;  // стандартный минимальный интервал между приёмами лекарств + возможен перед завтраком
                                 // а так же минимальный интервал для приёма до и после еды
     final int dayFull = 1440;   // кол-во минут в сутках всего
-    int de, db, dayDuration;
+    final int hour = 60;        // просто час
+    int de, db, dayDuration, mealCount;
 
     AppDatabase adb;
     DBDao dao;
@@ -27,18 +28,26 @@ public class TimetableMaker {
     List<MedSpec> priorityList; // здесь лекарства выстроены в порядке по приоритету,
                                 // учитывающему и кол-во связей и сочетание с пищей
 
+    ArrayList<Object> day = new ArrayList<>();
     private static final String TAG = "SET_PRIORITY";
+    private static final String MEALTIME = "MEALTIME";
 
     public TimetableMaker(Context cntxt) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(cntxt);
+        mealCount = Integer.parseInt(prefs.getString("meal_count", "3"));
         db = prefs.getInt("day_begin", 360);
         de = prefs.getInt("day_end", 1320);
+        int minDay = mealCount*mealInterval + stInterval; // минимальная длина дня = кол-во приёмов пищи * 2 часа + 30 минут утром
         if (de < db)
             dayDuration = (dayFull - db) + de;
         else dayDuration = de - db;
+                                        // если минимальная длина дня меньше или равна фактической (установленной пользователем),
+        if (minDay <= dayDuration) {    // то можно производиь расчёты дальше
+            adb = AppDatabase.getDatabase(cntxt);
+            dao = adb.Dao();
 
-        adb = AppDatabase.getDatabase(cntxt);
-        dao = adb.Dao();
+            setMealTime();
+        }
     }
 
     public void setPriority() {
@@ -125,7 +134,30 @@ public class TimetableMaker {
         }
 
         public byte getRelationsCount() { return relationsCount; }
-
         public byte getMealDepend() { return mealDepend; }
+    }
+
+    public void setMealTime(){
+        int meald = dayDuration - stInterval; // отнимаем стандартное утреннее время перед едой
+        int varMealInt = meald / mealCount;
+        if (varMealInt > 4*hour) {
+            meald -= 4*hour; // оставляем интервал в 4 часа между сном и последним приёмом пищи
+            Log.d(MEALTIME, "продолжительность дня: " + meald);
+            varMealInt = meald / (mealCount-1);
+            Log.d(MEALTIME, "интервалы между едой: " + varMealInt);
+        }
+        day.add(db + 30); // 1 приём пищи
+        for (int i = 1; i < mealCount; i++) {
+            day.add((int)day.get(0) + i*varMealInt);
+        }
+        for (int i = 0; i < mealCount; i++) {
+            int hours = (int)day.get(i) / 60;
+            int minutes = (int)day.get(i) % 60;
+            Log.d(MEALTIME, (i+1) + " приём пищи в " + hours + ":" + minutes);
+        }
+    }
+
+    public void setMealMeds() {
+
     }
 }
