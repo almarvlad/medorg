@@ -74,6 +74,7 @@ public class MedRepo {
             res = result;
             Log.d(TAG, "Call SetPriority method ...");
             ttMaker.setPriority();
+            ttMaker.setTimeAllMeds();
             Log.d("SAVE_MED", "res: "+result);
         }
     }

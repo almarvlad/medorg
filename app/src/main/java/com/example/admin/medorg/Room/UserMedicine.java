@@ -13,7 +13,7 @@ import java.util.Date;
 public class UserMedicine {
     public UserMedicine(String name, float timePer, long courseStart,
                         boolean timeType, String weekdays, float dose, String doseForm,
-                        byte instruct, String addInstruct, int duration, boolean active) {
+                        byte instruct, String addInstruct, int duration, boolean active, boolean hasNoncompat) {
         this.name = name;
         this.timePer = timePer;
         this.courseStart = courseStart;
@@ -25,18 +25,19 @@ public class UserMedicine {
         this.addInstruct = addInstruct;
         this.duration = duration;
         this.isActive = active;
+        this.hasNoncompat = hasNoncompat;
     }
 
-    public void setID(@NonNull int ID) {
+    public void setID(@NonNull long ID) {
         this.ID = ID;
     }
 
     @PrimaryKey(autoGenerate = true)
     @NonNull
     @ColumnInfo(name = "id")
-    private int ID;
+    private long ID;
 
-    public int getID(){
+    public long getID(){
         return this.ID;
     }
 
@@ -132,6 +133,16 @@ public class UserMedicine {
     private String addInstruct;
     @Nullable
     private boolean isActive;
+
+    public boolean isHasNoncompat() {
+        return hasNoncompat;
+    }
+
+    public void setHasNoncompat(boolean hasNoncompat) {
+        this.hasNoncompat = hasNoncompat;
+    }
+
+    private boolean hasNoncompat;
 
     //0 - частота (Н раз в день), 1 - интервалы (каждые Н часов)
     public boolean isTimeType() {
