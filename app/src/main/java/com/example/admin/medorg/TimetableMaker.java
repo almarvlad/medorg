@@ -6,15 +6,13 @@ import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import com.example.admin.medorg.Room.AppDatabase;
-import com.example.admin.medorg.Room.DBDao;
+import com.example.admin.medorg.Room.MedicineDao;
 import com.example.admin.medorg.Room.UserMedicine;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import static java.lang.Math.abs;
 
@@ -27,13 +25,14 @@ public class TimetableMaker {
     int de, db, dayDuration, mealCount;
 
     AppDatabase adb;
-    DBDao dao;
+    MedicineDao dao;
     List<UserMedicine> userMeds;
     List<MedSpec> priorityList; // здесь лекарства выстроены в порядке по приоритету,
                                 // учитывающему и кол-во связей и сочетание с пищей
 
     List<MealAround> mealList;
-    TreeMap<Integer, ArrayList<Integer>> day = new TreeMap<>();
+    List<TimeMark> day = new ArrayList<>();
+    //TreeMap<Integer, ArrayList<Integer>> day = new TreeMap<>();
     private static final String TAG = "SET_PRIORITY";
     private static final String MEALTIME = "MEALTIME";
 
@@ -104,9 +103,21 @@ public class TimetableMaker {
         }
     }
 
+    public void sortAndSaveTimetable(){
+        new ShellSort().sort(day);
+        for (int i = 0; i < day.size(); i++) {
+            if (day.get(i).mark > -1)
+                Log.d(MEALTIME, "Время " + getHours(day.get(i).time) + ":" + getMinutes(day.get(i).time) +
+                            "; Лекарство " + day.get(i).mark);
+            else
+                Log.d(MEALTIME, "Время " + getHours(day.get(i).time) + ":" + getMinutes(day.get(i).time) +
+                        "; Приём пищи");
+        }
+    }
+
     // пусть останеся на всякий, вдруг понадобится ещё
     public class ShellSort {
-        public void sort (List<MedSpec> arr) {
+        public void sort (List<TimeMark> arr) {
             int increment = arr.size() / 2;
             while (increment >= 1) {
                 for (int startIndex = 0; startIndex < increment; startIndex++) {
@@ -116,10 +127,10 @@ public class TimetableMaker {
             }
         }
 
-        private void insertionSort (List<MedSpec> arr, int startIndex, int increment) {
+        private void insertionSort (List<TimeMark> arr, int startIndex, int increment) {
             for (int i = startIndex; i < arr.size() - 1; i = i + increment) {
                 for (int j = Math.min(i + increment, arr.size() - 1); j - increment >= 0; j = j - increment) {
-                    if (arr.get(j - increment).getRelationsCount() > arr.get(j).getRelationsCount()) {
+                    if (arr.get(j - increment).time > arr.get(j).time) {
                         Collections.swap(arr, j, j - increment);
                     } else break;
                 }
@@ -172,14 +183,105 @@ public class TimetableMaker {
         for (int i = 1; i < mealCount; i++) {
             mealList.add(new MealAround(mealList.get(0).mealTime + i*varMealInt));
         }
-        /*
-        for (int i = 0; i < mealList.size(); i++) {
-            int hours = mealList.get(i).mealTime / 60;
-            int minutes = mealList.get(i).mealTime % 60;
-            Log.d(MEALTIME, (i+1) + " приём пищи в " + hours + ":" + minutes);
-        }
-        */
     }
+
+    public int getHours(int time){ return time / 60; }
+    public int getMinutes(int time){ return time % 60; }
+
+
+    public void setTimeAllMeds(){
+        for (int i = 0; i < userMeds.size(); i++) {
+            Log.d(MEALTIME, "вызван setTimeAllMeds");
+            setTimeMed(userMeds.get(i));
+        }
+        for (int i = 0; i < mealList.size(); i++) {
+            mealList.get(i).readDataMeal();
+        }
+    }
+
+    public void setTimeMed(UserMedicine med) {
+        if (med.isTimeType()){ // если интервалы (каждые н часов)
+            int frequency = (int)(dayFull / (med.getTimePer() * hour)); // находим кол-во раз, которое будет умещаться в сутках
+            switch (med.getInstruct()){
+                case 3: // не важно
+                    int tempTime;
+                    for (int i = 0; i < frequency; i++) { // для каждого раза в день
+                        if (med.getTimePer()*hour >= (dayFull-dayDuration)) // если больше периода сна, то расставляем в период бодрствования
+                            tempTime = db + med.getTimePer()*hour*i;
+                        else tempTime = med.getTimePer()*i*hour; // иначе расставляем по всем суткам
+                        day.add(new TimeMark(tempTime, (int)med.getID()));
+                    }
+                    break;
+                case 0:
+                case 1:
+                case 2:
+                    if (frequency > mealCount)
+                        Log.d(MEALTIME, "нужно увеличить кол-во приёмов пищи :с");
+                    else if (frequency == mealCount)
+                        for (int i = 0; i < mealCount; i++)
+                            mealList.get(i).addMed((int)med.getID(), med.getInstruct());
+                    else
+                        setMedTake((int)(med.getTimePer() * hour), med.getID(), med.getInstruct(), frequency);
+                    break;
+                default: break;
+            }
+        } else { // если частота (н раз в день)
+            int recomInterval = dayFull / (int)med.getTimePer(); // находим рекомендуемый интервал
+            switch (med.getInstruct()){
+                case 3: // н раз в день // не важно
+                    int tempTime;
+                    for (int i = 0; i < med.getTimePer(); i++) { // для каждого раза в день
+                        if (recomInterval >= dayFull-dayDuration)
+                            tempTime = db + recomInterval*i;
+                        else tempTime = (recomInterval / 2) + recomInterval*i;
+                        day.add(new TimeMark(tempTime, (int)med.getID()));
+                    }
+                    break;
+                case 0:
+                case 1:
+                case 2:
+                    if (med.getTimePer()>mealCount) // если приёмов пищи меньше
+                        Log.d(MEALTIME, "нужно увеличить кол-во приёмов пищи :с");
+                    else if (med.getTimePer()== mealCount) { // если приёмов пищи столько же, то расставляем рядом со всеми рассчитанными приёмами пищи
+                        for (int i = 0; i < mealCount; i++)
+                            mealList.get(i).addMed((int)med.getID(), med.getInstruct());
+                    } else
+                        setMedTake(recomInterval, med.getID(), med.getInstruct(), med.getTimePer()); // расставляем по времени приёма пищи
+                    break;
+                default: break;
+            }
+        }
+    }
+    public void setMedTake (int recomInterval, long id, byte instr, float timePer) {
+        for (int i = 0; i < timePer; i++) { // для каждого раза в день
+            int tempTime = (recomInterval / 2) + recomInterval*i; // находим рекомендуемое время приёма
+            int minTime = dayFull;
+            int mealNumber = 0;
+            for (int j = 0; j < mealList.size(); j++) { // для каждого приёма пищи находим модуль времени между tempTime
+                if (minTime > abs(mealList.get(j).mealTime-tempTime)) {
+                    mealNumber = j; minTime = abs(mealList.get(j).mealTime-tempTime);
+                }
+            }
+            mealList.get(mealNumber).addMed((int)id, instr);
+        }
+    }
+
+//  ВНУТРЕННИЕ КЛАССЫ
+    class TimeMark { // отметка во времени
+        private int time;
+        private int mark; // id лекарства
+
+        public TimeMark(int time, int mark) {
+            this.time = time;
+            this.mark = mark;
+        }
+
+        public int getTime() { return time; }
+        public void setTime(int time) { this.time = time; }
+        public int getMark() { return mark; }
+        public void setMark(int mark) { this.mark = mark; }
+    }
+
 
     class MealAround {
         int mealTime;
@@ -206,85 +308,11 @@ public class TimetableMaker {
             }
         }
 
-        public int getHours(int time){ return time / 60; }
-        public int getMinutes(int time){ return time % 60; }
-
         public void readDataMeal(){
-            for (int i = 0; i < beforeMeal.size(); i++) {
-                Log.d(MEALTIME, "лекарство: " + beforeMeal.get(i).mark +
-                    " ; время до еды: " + getHours(beforeMeal.get(i).time) + ":" + getMinutes(beforeMeal.get(i).time));
-            }
-            Log.d(MEALTIME, "приём пищи в " + getHours(mealTime) + ":" + getMinutes(mealTime));
-            for (int i = 0; i < atMeal.size(); i++) {
-                Log.d(MEALTIME, "лекарство: " + atMeal.get(i).mark +
-                        " ; время: " + getHours(atMeal.get(i).time) + ":" + getMinutes(atMeal.get(i).time));
-            }
-            for (int i = 0; i < afterMeal.size(); i++) {
-                Log.d(MEALTIME, "лекарство: " + afterMeal.get(i).mark +
-                        " ; время после еды: " + getHours(afterMeal.get(i).time) + ":" + getMinutes(afterMeal.get(i).time));
-            }
-        }
-    }
-
-    class TimeMark {
-        private int time;
-        private int mark; // id лекарства
-
-        public TimeMark(int time, int mark) {
-            this.time = time;
-            this.mark = mark;
-        }
-
-        public int getTime() { return time; }
-        public void setTime(int time) { this.time = time; }
-
-        public int getMark() { return mark; }
-        public void setMark(int mark) { this.mark = mark; }
-    }
-
-    public void setTimeAllMeds(){
-        for (int i = 0; i < userMeds.size(); i++) {
-            Log.d(MEALTIME, "вызван setTimeAllMeds");
-            setTimeMed(userMeds.get(i));
-        }
-        for (int i = 0; i < mealList.size(); i++) {
-            mealList.get(i).readDataMeal();
-        }
-    }
-    public void setTimeMed(UserMedicine med) {
-        if (med.getInstruct()<3) { // если есть зависимость от времени
-            if (med.isTimeType()) { // если интервалы (каждые н часов)
-                Log.d(MEALTIME, "если интервалы ... ничего не выполняем, т.к. я упая и пока не знаю, что написать");
-            } else { // если частота (н раз в день)
-                //Log.d(MEALTIME, "частота приёмов пищи: каждые " + med.getTimePer() + " часа");
-                if (med.getTimePer()>mealCount) // если приёмов пищи меньше
-                    Log.d(MEALTIME, "нужно увеличить кол-во приёмов пищи :с");
-                    // если приёмов пищи столько же, то расставляем рядом со всеми рассчитанными приёмами пищи
-                else if (med.getTimePer()== mealCount) {
-                    for (int i = 0; i < mealCount; i++) {
-                        mealList.get(i).addMed((int)med.getID(), med.getInstruct());
-                    }
-                } else {
-                    // находим рекомендуемый интервал
-                    int recomInterval = dayFull / (int)med.getTimePer();
-                    // расставляем по времени
-                    for (int i = 0; i < med.getTimePer(); i++) { // для каждого раза в день
-                        // находим рекомендуемое время приёма
-                        int tempTime = (recomInterval / 2) + recomInterval*i;
-                        Log.d(MEALTIME, "Приём №" + i + "; примерное время приёма: " + tempTime);
-                        int minTime = dayFull;
-                        int mealNumber = 0;
-                        for (int j = 0; j < mealList.size(); j++) { // для каждого приёма пищи находим модуль времени между tempTime
-                            Log.d(MEALTIME, "разница между приёмом пищи №" + j + " " + abs(mealList.get(j).mealTime-tempTime));
-                            if (minTime > abs(mealList.get(j).mealTime-tempTime)) {
-                                mealNumber = j; minTime = abs(mealList.get(j).mealTime-tempTime);
-                            }
-                        }
-                        Log.d(MEALTIME, "выбран приём пищи №" + mealNumber);
-                        mealList.get(mealNumber).addMed((int)med.getID(), med.getInstruct());
-                    }
-                }
-            }
+            for (int i = 0; i < beforeMeal.size(); i++) { day.add(beforeMeal.get(i)); }   // лекарства до еды
+            day.add(new TimeMark(mealTime, -1));                                    // -1 - значит приём пищи
+            for (int i = 0; i < atMeal.size(); i++) { day.add(atMeal.get(i)); }           // лекарства во время еды
+            for (int i = 0; i < afterMeal.size(); i++) { day.add(afterMeal.get(i)); }     // лекарства после еды
         }
     }
 }

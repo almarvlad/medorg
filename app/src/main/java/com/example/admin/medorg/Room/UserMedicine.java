@@ -11,7 +11,7 @@ import java.util.Date;
 
 @Entity(tableName = "medicals")
 public class UserMedicine {
-    public UserMedicine(String name, float timePer, long courseStart,
+    public UserMedicine(String name, int timePer, long courseStart,
                         boolean timeType, String weekdays, float dose, String doseForm,
                         byte instruct, String addInstruct, int duration, boolean active, boolean hasNoncompat) {
         this.name = name;
@@ -43,21 +43,21 @@ public class UserMedicine {
 
     @ColumnInfo(name = "med_name")
     @NonNull
-    private String name;
+    private String name; // название лекарства
 
-    public float getTimePer() {
+    public int getTimePer() {
         return timePer;
     }
 
-    public void setTimePer(float timePer) {
+    public void setTimePer(int timePer) {
         this.timePer = timePer;
     }
 
     @ColumnInfo(name = "time_per")
-    private float timePer;
+    private int timePer; // каждые н часов, н раз в день
 
     @ColumnInfo(name = "course_start")
-    private long courseStart;
+    private long courseStart; // начало курса
 
     public long getCourseStart() {
         return courseStart;
@@ -123,11 +123,11 @@ public class UserMedicine {
         isActive = active;
     }
 
-    private int duration;
-    private String weekdays;
+    private int duration; // продолжительность курса // 0 нет фикс продолжительности
+    private String weekdays; // в какие дни недели
     private float dose;
     private String doseForm;
-    private byte instruct;
+    private byte instruct; // зависимость от еды
 
     @Nullable
     private String addInstruct;

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Dao
-public interface DBDao {
+public interface MedicineDao {
     @Query("SELECT * FROM medicals")
     LiveData<List<UserMedicine>> getAllMeds();
 

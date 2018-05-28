@@ -23,6 +23,7 @@ public class TimetableRVAdapter extends RecyclerView.Adapter<TimetableRVAdapter.
     private List<String> exampleStrings;
     private Context con;
 
+    // конструктор адаптера
     TimetableRVAdapter(Context context, ArrayList<String> ex) {
         mInflater = LayoutInflater.from(context);
         exampleStrings = ex;
@@ -30,7 +31,7 @@ public class TimetableRVAdapter extends RecyclerView.Adapter<TimetableRVAdapter.
     }
 
     @NonNull
-    @Override
+    @Override // создание элемента в списке recyclerview
     public TimetableViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = mInflater.inflate(R.layout.timetable_element, parent, false);
         return new TimetableViewHolder(itemView);

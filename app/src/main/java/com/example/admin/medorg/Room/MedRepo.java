@@ -5,14 +5,16 @@ import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.admin.medorg.MedEdit;
 import com.example.admin.medorg.TimetableMaker;
 
 import java.util.List;
 
 public class MedRepo {
-    public DBDao mDBDao;
+    public MedicineDao mMedicineDao;
+    public TimetableDao mTimetableDao;
     private LiveData<List<UserMedicine>> mAllMeds;
+
+    private LiveData<List<Timetable>> timetableList;
     public static Long res;
     TimetableMaker ttmaker;
     private static final String TAG = "SET_PRIORITY";
@@ -20,32 +22,41 @@ public class MedRepo {
 
     MedRepo(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
-        mDBDao = db.Dao();
-        mAllMeds = mDBDao.getAllMeds();
+        mMedicineDao = db.Dao();
+        mAllMeds = mMedicineDao.getAllMeds();
+
+        mTimetableDao = db.ttDao();
+        timetableList = mTimetableDao.getTimetable();
+
         ttmaker = new TimetableMaker(application);
     }
 
     LiveData<List<UserMedicine>> getAllMeds() {
         return mAllMeds;
     }
+    LiveData<List<Timetable>> getTimetableList() { return timetableList; }
 
     public void insert (UserMedicine userMed, long[] noncompat) {
-        new insertAsyncTask(mDBDao, userMed, noncompat, ttmaker).execute();
+        new insertAsyncTask(mMedicineDao, userMed, noncompat, ttmaker).execute();
     }
 
+    /*
+    public void insertTimetable (Timetable timetable) {
+        new insertAsyncTask(mMedicineDao, userMed, noncompat, ttmaker).execute();
+    }*/
+
     public void deleteMed(long id) {
-        Log.d("MED_INFO", "вызван AsyncTask для удаления");
-        new deleteMedAsyncTask(mDBDao, id).execute();
+        new deleteMedAsyncTask(mMedicineDao, id).execute();
     }
 
     // добавление в словарь
     private static class insertAsyncTask extends AsyncTask<UserMedicine, Void, Long> {
-        private final DBDao mAsyncTaskDao;
+        private final MedicineDao mAsyncTaskDao;
         private UserMedicine umed;
         private long[] nc;
         private TimetableMaker ttMaker;
 
-        insertAsyncTask(DBDao dao, UserMedicine umed, long[] nonc, TimetableMaker tm) {
+        insertAsyncTask(MedicineDao dao, UserMedicine umed, long[] nonc, TimetableMaker tm) {
             mAsyncTaskDao = dao;
             this.umed = umed;
             this.nc = nonc;
@@ -75,16 +86,17 @@ public class MedRepo {
             Log.d(TAG, "Call SetPriority method ...");
             ttMaker.setPriority();
             ttMaker.setTimeAllMeds();
+            ttMaker.sortAndSaveTimetable();
             Log.d("SAVE_MED", "res: "+result);
         }
     }
 
     // удаление из словаря
     private static class deleteMedAsyncTask extends AsyncTask<Void, Void, String> {
-        private final DBDao mAsyncTaskDao;
+        private final MedicineDao mAsyncTaskDao;
         private long id;
 
-        deleteMedAsyncTask(DBDao dao, long id) {
+        deleteMedAsyncTask(MedicineDao dao, long id) {
             mAsyncTaskDao = dao;
             this.id = id;
         }

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,7 +16,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.admin.medorg.Room.AppDatabase;
-import com.example.admin.medorg.Room.DBDao;
+import com.example.admin.medorg.Room.MedicineDao;
 import com.example.admin.medorg.Room.MedicineViewModel;
 import com.example.admin.medorg.Room.NonCompatMeds;
 import com.example.admin.medorg.Room.UserMedicine;
@@ -32,7 +31,7 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
     public String[] weekdays_list;
 
     AppDatabase adb;
-    DBDao dao;
+    MedicineDao dao;
 
     private TextToSpeech mTTS;
     private FloatingActionButton fab;
