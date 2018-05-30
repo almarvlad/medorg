@@ -12,9 +12,10 @@ import java.util.List;
 public class MedRepo {
     public MedicineDao mMedicineDao;
     public TimetableDao mTimetableDao;
-    private LiveData<List<UserMedicine>> mAllMeds;
 
+    private LiveData<List<UserMedicine>> mAllMeds;
     private LiveData<List<Timetable>> timetableList;
+
     public static Long res;
     TimetableMaker ttmaker;
     private static final String TAG = "SET_PRIORITY";
@@ -78,16 +79,18 @@ public class MedRepo {
                     }
                 }
             }
+
+            Log.d(TAG, "Call SetPriority method ...");
+            ttMaker.setPriority();
+            ttMaker.setTimeAllMeds();
+            ttMaker.sortAndSaveTimetable();
+
             return r;
         }
 
         protected void onPostExecute(Long result) {
             res = result;
-            Log.d(TAG, "Call SetPriority method ...");
-            ttMaker.setPriority();
-            ttMaker.setTimeAllMeds();
-            ttMaker.sortAndSaveTimetable();
-            Log.d("SAVE_MED", "res: "+result);
+
         }
     }
 
@@ -100,14 +103,11 @@ public class MedRepo {
             mAsyncTaskDao = dao;
             this.id = id;
         }
-
         @Override
         protected String doInBackground(Void... params) {
             String r = mAsyncTaskDao.getById(id).getName();
-            Log.d("MED_INFO", "Фоновый процесс по удалению из бд");
             mAsyncTaskDao.deleteMed(id);
             mAsyncTaskDao.deleteNoncompatMed(id);
-            Log.d("MED_INFO", "Лекарство с id " + id + " удалено");
             return r;
         }
     }

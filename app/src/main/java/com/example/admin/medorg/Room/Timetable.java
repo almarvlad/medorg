@@ -9,6 +9,10 @@ import android.support.annotation.Nullable;
 
 @Entity(tableName = "timetable")
 public class Timetable {
+    public void setId(@NonNull int id) {
+        this.id = id;
+    }
+
     @PrimaryKey(autoGenerate = true)
     @NonNull
     @ColumnInfo(name = "id")
@@ -16,14 +20,19 @@ public class Timetable {
 
     @NonNull // номер дня недели
     private byte weekday;
-    @NonNull
+
+    public Timetable(@NonNull byte weekday, @NonNull int time, @NonNull int mark) {
+        this.weekday = weekday;
+        this.time = time;
+        this.mark = mark;
+    }
+
     private int time;
-    @NonNull // либо ID лекарства, либо -1 - приём пищи
+    // либо ID лекарства, либо -1 - приём пищи
     private int mark;
 
-    @NonNull
     public int getTime() { return time; }
-    public void setTime(@NonNull int time) { this.time = time; }
+    public void setTime(int time) { this.time = time; }
 
     @NonNull
     public int getMark() { return mark; }

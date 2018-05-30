@@ -1,5 +1,6 @@
 package com.example.admin.medorg;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
@@ -7,11 +8,20 @@ import android.util.Log;
 
 import com.example.admin.medorg.Room.AppDatabase;
 import com.example.admin.medorg.Room.MedicineDao;
+import com.example.admin.medorg.Room.MedicineViewModel;
+import com.example.admin.medorg.Room.Timetable;
+import com.example.admin.medorg.Room.TimetableComplete;
+import com.example.admin.medorg.Room.TimetableCompleteDao;
+import com.example.admin.medorg.Room.TimetableDao;
+import com.example.admin.medorg.Room.TimetableViewModel;
 import com.example.admin.medorg.Room.UserMedicine;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import static java.lang.Math.abs;
@@ -26,7 +36,10 @@ public class TimetableMaker {
 
     AppDatabase adb;
     MedicineDao dao;
+    TimetableDao ttDao;
+    TimetableCompleteDao ttCompleteDao;
     List<UserMedicine> userMeds;
+    List<Timetable> dayTimetable;
     List<MedSpec> priorityList; // здесь лекарства выстроены в порядке по приоритету,
                                 // учитывающему и кол-во связей и сочетание с пищей
 
@@ -35,6 +48,8 @@ public class TimetableMaker {
     //TreeMap<Integer, ArrayList<Integer>> day = new TreeMap<>();
     private static final String TAG = "SET_PRIORITY";
     private static final String MEALTIME = "MEALTIME";
+
+    //private TimetableViewModel mTimetableViewModel;
 
     public TimetableMaker(Context cntxt) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(cntxt);
@@ -49,6 +64,10 @@ public class TimetableMaker {
         if (minDay <= dayDuration) {    // то можно производиь расчёты дальше
             adb = AppDatabase.getDatabase(cntxt);
             dao = adb.Dao();
+            ttDao = adb.ttDao();
+            ttCompleteDao = adb.ttCompleteDao();
+
+            //mTimetableViewModel = ViewModelProviders.of(cntxt).get(TimetableViewModel.class);
 
             setMealTime();
         }
@@ -57,7 +76,7 @@ public class TimetableMaker {
     public void setPriority() {
         userMeds = dao.getActiveMeds();
         priorityList = new ArrayList<>(userMeds.size());
-        Log.d(TAG, "кол-во активных лекарств: " + userMeds.size());
+        //Log.d(TAG, "кол-во активных лекарств: " + userMeds.size());
 
         for (int i = 0; i < userMeds.size(); i++) { // формируем лист с характеристиками лекарств для его последующей сортировки
             long idmed = userMeds.get(i).getID();
@@ -78,7 +97,6 @@ public class TimetableMaker {
         }
         Log.d(TAG, "PriorityList.size = " + priorityList.size());
         if (priorityList.size()!=0) {
-            // new ShellSort().sort(priorityList);
 
             Collections.sort(priorityList, new Comparator<MedSpec>() {
                 public int compare(MedSpec o1, MedSpec o2) {
@@ -105,6 +123,38 @@ public class TimetableMaker {
 
     public void sortAndSaveTimetable(){
         new ShellSort().sort(day);
+        for (byte i = 1; i < 7; i++) {
+            for (int j = 0; j < day.size(); j++)
+                ttDao.insert(new Timetable(i, day.get(j).getTime(), day.get(j).getMark()));
+        }
+
+        Calendar c = Calendar.getInstance(); // текущая дата
+        Calendar plusMonth = Calendar.getInstance();;
+        plusMonth.add(Calendar.MONTH, 1); // дата через месяц
+        int nowTime = c.get(Calendar.HOUR_OF_DAY)*60 + c.get(Calendar.MINUTE);
+
+        //byte j = 0;
+        while (!c.after(plusMonth)) {
+            int dayNumber = (c.get(Calendar.DAY_OF_WEEK)-1 > 0) ? c.get(Calendar.DAY_OF_WEEK)-1 : 7; // находим день недели текущей даты
+            dayTimetable = ttDao.getWeekdayTimetable(dayNumber); // получаем расписание для этого дня недели
+
+            // давайте пока обойдёмся без текущего времени, хорошо?
+            for (int i = 0; i < dayTimetable.size(); i++) {
+                Calendar timeTakeMed = new GregorianCalendar(c.get(Calendar.YEAR), c.get(Calendar.MONTH),
+                        c.get(Calendar.DAY_OF_MONTH), getHours(dayTimetable.get(i).getTime()), getMinutes(dayTimetable.get(i).getTime()));
+                ttCompleteDao.insert(new TimetableComplete(timeTakeMed.getTimeInMillis(), dayTimetable.get(i).getMark()));
+            }
+            //текущая дата в цикле
+            Calendar date_one = new GregorianCalendar(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+
+            // текущая дата в цикле + 1 день
+            Calendar date_two = new GregorianCalendar(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+            date_two.add(Calendar.DATE, 1);
+
+            // переходим к сл дню - увеличиваем переменную цикла
+            c.add(Calendar.DATE, 1); // переходим к сл дню
+        }
+        /*
         for (int i = 0; i < day.size(); i++) {
             if (day.get(i).mark > -1)
                 Log.d(MEALTIME, "Время " + getHours(day.get(i).time) + ":" + getMinutes(day.get(i).time) +
@@ -113,44 +163,12 @@ public class TimetableMaker {
                 Log.d(MEALTIME, "Время " + getHours(day.get(i).time) + ":" + getMinutes(day.get(i).time) +
                         "; Приём пищи");
         }
+        */
+
     }
 
-    // пусть останеся на всякий, вдруг понадобится ещё
-    public class ShellSort {
-        public void sort (List<TimeMark> arr) {
-            int increment = arr.size() / 2;
-            while (increment >= 1) {
-                for (int startIndex = 0; startIndex < increment; startIndex++) {
-                    insertionSort(arr, startIndex, increment);
-                }
-                increment = increment / 2;
-            }
-        }
+    public void populateTTComplete () {
 
-        private void insertionSort (List<TimeMark> arr, int startIndex, int increment) {
-            for (int i = startIndex; i < arr.size() - 1; i = i + increment) {
-                for (int j = Math.min(i + increment, arr.size() - 1); j - increment >= 0; j = j - increment) {
-                    if (arr.get(j - increment).time > arr.get(j).time) {
-                        Collections.swap(arr, j, j - increment);
-                    } else break;
-                }
-            }
-        }
-    }
-
-    public class MedSpec{
-        long id;
-        byte relationsCount; // кол-во несовместимых лекарств с данным
-        byte mealDepend; // 0 - не важно, 1 - во время еды, 2 - до/после еды
-
-        public MedSpec(byte nc, byte meal, long id) {
-            this.id = id;
-            relationsCount = nc;
-            mealDepend = meal;
-        }
-
-        public byte getRelationsCount() { return relationsCount; }
-        public byte getMealDepend() { return mealDepend; }
     }
 
     public void setMealTime(){
@@ -158,18 +176,9 @@ public class TimetableMaker {
         int varMealInt = meald / mealCount;
         if (varMealInt > 4*hour) {
             meald -= 4*hour; // оставляем интервал в 4 часа между сном и последним приёмом пищи
-            //Log.d(MEALTIME, "продолжительность дня: " + meald);
             varMealInt = meald / (mealCount-1);
-            //Log.d(MEALTIME, "интервалы между едой: " + varMealInt);
         }
         /*
-        ArrayList<Integer> list = new ArrayList<>();
-        list.add(-1);
-        day.put(db + 30, list); // 1 приём пищи
-        int firstKey = day.firstKey();
-        for (int i = 1; i < mealCount; i++) {
-            day.put(firstKey + i*varMealInt, list);
-        }
         int i = 1;
         for (Map.Entry e : day.entrySet()) {
             int hours = (int)e.getKey() / 60;
@@ -282,7 +291,7 @@ public class TimetableMaker {
         public void setMark(int mark) { this.mark = mark; }
     }
 
-
+/*******************************************************************/
     class MealAround {
         int mealTime;
         ArrayList<TimeMark> beforeMeal = new ArrayList<>();
@@ -307,7 +316,6 @@ public class TimetableMaker {
                 default: break;
             }
         }
-
         public void readDataMeal(){
             for (int i = 0; i < beforeMeal.size(); i++) { day.add(beforeMeal.get(i)); }   // лекарства до еды
             day.add(new TimeMark(mealTime, -1));                                    // -1 - значит приём пищи
@@ -315,4 +323,43 @@ public class TimetableMaker {
             for (int i = 0; i < afterMeal.size(); i++) { day.add(afterMeal.get(i)); }     // лекарства после еды
         }
     }
+
+/***********************************************/
+    public class MedSpec{
+        long id;
+        byte relationsCount; // кол-во несовместимых лекарств с данным
+        byte mealDepend; // 0 - не важно, 1 - во время еды, 2 - до/после еды
+
+        public MedSpec(byte nc, byte meal, long id) {
+            this.id = id;
+            relationsCount = nc;
+            mealDepend = meal;
+        }
+
+        public byte getRelationsCount() { return relationsCount; }
+        public byte getMealDepend() { return mealDepend; }
+    }
+
+/************************************************************/
+    public class ShellSort {
+        public void sort (List<TimeMark> arr) {
+            int increment = arr.size() / 2;
+            while (increment >= 1) {
+                for (int startIndex = 0; startIndex < increment; startIndex++)
+                    insertionSort(arr, startIndex, increment);
+                increment = increment / 2;
+            }
+        }
+        private void insertionSort (List<TimeMark> arr, int startIndex, int increment) {
+            for (int i = startIndex; i < arr.size() - 1; i = i + increment) {
+                for (int j = Math.min(i + increment, arr.size() - 1); j - increment >= 0; j = j - increment) {
+                    if (arr.get(j - increment).time > arr.get(j).time) {
+                        Collections.swap(arr, j, j - increment);
+                    } else break;
+                }
+            }
+        }
+    }
+
+
 }

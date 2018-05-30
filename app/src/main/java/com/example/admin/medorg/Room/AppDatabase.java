@@ -9,11 +9,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
-@Database(entities = {UserMedicine.class, NonCompatMeds.class, Timetable.class}, version = 3)
+@Database(entities = {UserMedicine.class, NonCompatMeds.class, Timetable.class, TimetableComplete.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract MedicineDao Dao();
     public abstract TimetableDao ttDao();
+    public abstract TimetableCompleteDao ttCompleteDao();
     private static AppDatabase INSTANCE; // объект базы данных, который должен оставаться в единственном экземпляре
 
     public static AppDatabase getDatabase(final Context context) {
@@ -45,10 +46,12 @@ public abstract class AppDatabase extends RoomDatabase {
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
         private final MedicineDao mDao;
         private final TimetableDao ttDao;
+        private final TimetableCompleteDao ttCompleteDao;
 
         PopulateDbAsync(AppDatabase db) {
             mDao = db.Dao();
             ttDao = db.ttDao();
+            ttCompleteDao = db.ttCompleteDao();
         }
 
         @Override
