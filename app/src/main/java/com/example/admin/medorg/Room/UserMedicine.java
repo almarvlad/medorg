@@ -12,7 +12,7 @@ import java.util.Date;
 @Entity(tableName = "medicals")
 public class UserMedicine {
     public UserMedicine(String name, int timePer, long courseStart,
-                        boolean timeType, String weekdays, float dose, String doseForm,
+                        boolean timeType, String weekdays, String dose, String doseForm,
                         byte instruct, String addInstruct, int duration, boolean active, boolean hasNoncompat) {
         this.name = name;
         this.timePer = timePer;
@@ -83,11 +83,11 @@ public class UserMedicine {
         this.weekdays = weekdays;
     }
 
-    public float getDose() {
+    public String getDose() {
         return dose;
     }
 
-    public void setDose(float dose) {
+    public void setDose(String dose) {
         this.dose = dose;
     }
 
@@ -125,7 +125,7 @@ public class UserMedicine {
 
     private int duration; // продолжительность курса // 0 нет фикс продолжительности
     private String weekdays; // в какие дни недели
-    private float dose;
+    private String dose;
     private String doseForm;
     private byte instruct; // зависимость от еды
 

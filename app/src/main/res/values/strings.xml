@@ -103,6 +103,7 @@
 
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
+    <string name="no_meds_this_day">Нет лекарств на этот день</string>
 
 
 </resources>

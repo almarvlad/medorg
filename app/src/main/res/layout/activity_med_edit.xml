@@ -296,7 +296,9 @@
                             android:layout_width="50dp"
                             android:layout_weight="1"
                             android:text="1"
-                            android:inputType="numberDecimal"/>
+                            android:inputType="phone"
+                            android:digits="0123456789/.,"
+                            />
                         <Spinner
                             android:id="@+id/spinDose"
                             android:layout_width="wrap_content"

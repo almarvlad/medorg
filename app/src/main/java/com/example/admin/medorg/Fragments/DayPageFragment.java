@@ -82,20 +82,49 @@ public class DayPageFragment extends Fragment {
         date_one.setTimeInMillis(getArguments().getLong(DATE_IN_MILLIS));
         Calendar date_two = new GregorianCalendar(date_one.get(Calendar.YEAR), date_one.get(Calendar.MONTH), date_one.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
         date_two.add(Calendar.DATE, 1);
-        List<Long> exampleTime = ttCompleteDao.getTimeList(date_one.getTimeInMillis(), date_two.getTimeInMillis());
+        Date d1 = new Date(date_one.getTimeInMillis());
+        Date d2 = new Date(date_two.getTimeInMillis());
+        List<TimeMarkLong> listTime = new ArrayList<TimeMarkLong>();
+        listTime = ttCompleteDao.getDistinctTimeList(date_one.getTimeInMillis(), date_two.getTimeInMillis());
         List<TimetableComplete> listMedsTime = ttCompleteDao.getTimetableByDate(date_one.getTimeInMillis(), date_two.getTimeInMillis());
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         int mealCount = Integer.parseInt(prefs.getString("meal_count", "3"));
 
-        if (exampleTime.size() > mealCount) {
+
+        if (listTime.size() > mealCount) {
             title.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
-            final TimetableRVAdapter adapter = new TimetableRVAdapter(getContext(), exampleTime, listMedsTime);
+            final TimetableRVAdapter adapter = new TimetableRVAdapter(getContext(), listTime, listMedsTime);
             recyclerView.setAdapter(adapter);
         }
-
         return view;
+    }
+
+    public static class TimeMarkLong {
+        private long date_time;
+        private int id_med; // id лекарства
+
+        public TimeMarkLong(long date_time, int id_med) {
+            this.date_time = date_time;
+            this.id_med = id_med;
+        }
+
+        public long getDate_time() {
+            return date_time;
+        }
+
+        public void setDate_time(long date_time) {
+            this.date_time = date_time;
+        }
+
+        public int getId_med() {
+            return id_med;
+        }
+
+        public void setId_med(int id_med) {
+            this.id_med = id_med;
+        }
     }
 
     @Override

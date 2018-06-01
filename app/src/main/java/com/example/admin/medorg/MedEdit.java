@@ -304,7 +304,7 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
 
                     // добавляем новый объект-запись о лекарстве
                     UserMedicine med = new UserMedicine(editMedName.getText().toString(), t,
-                            c.getTime().getTime(), timetype, num, Float.parseFloat(editDose.getText().toString()),
+                            c.getTime().getTime(), timetype, num, editDose.getText().toString(),
                             spinFormDose.getSelectedItem().toString(), instr, add_instr.getText().toString(),
                             daysCount, true, noncompatID!=null);
                     mMedicineViewModel.insert(med, noncompatID);

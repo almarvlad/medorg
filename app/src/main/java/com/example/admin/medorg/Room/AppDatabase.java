@@ -68,11 +68,12 @@ public abstract class AppDatabase extends RoomDatabase {
                     " course_start,LONG;" +
                     " Duration,INTEGER;" +
                     " Weekdays,VARCHAR(7);" +
-                    " Dose,REAL;" +
+                    " Dose,INTEGER;" +
                     " DoseForm,VARCHAR;" +
                     " Instruct,TINYINT;" +
                     " AddInstruct,VARCHAR(255);" +
-                    " IsActive,BOOLEAN DEFAULT 0 NOT NULL");
+                    " IsActive,BOOLEAN DEFAULT 0 NOT NULL;" +
+                    " hasNoncompat,BOOLEAN");
         }
     };
     public static final Migration MIGRATION_2_3 = new Migration(2, 3) {

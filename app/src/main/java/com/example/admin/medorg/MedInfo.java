@@ -148,7 +148,7 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
 
     // false - частота (Н раз(а) в день)
     // true - интервалы (каждые H часов)
-    public String setIntervalInfo (boolean type, float per) {
+    public String setIntervalInfo (boolean type, int per) {
         String res;
         if (!type) {
             if ((per > 1)&&(per < 5))

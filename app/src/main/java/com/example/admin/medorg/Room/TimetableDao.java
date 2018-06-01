@@ -18,4 +18,7 @@ public interface TimetableDao {
 
     @Query("SELECT * from timetable WHERE weekday = :wday ORDER BY time")
     List<Timetable> getWeekdayTimetable(int wday);
+
+    @Query("DELETE FROM timetable")
+    void deleteTimetable();
 }

@@ -123,7 +123,8 @@ public class TimetableMaker {
 
     public void sortAndSaveTimetable(){
         new ShellSort().sort(day);
-        for (byte i = 1; i < 7; i++) {
+        ttDao.deleteTimetable();
+        for (byte i = 1; i <= 7; i++) {
             for (int j = 0; j < day.size(); j++)
                 ttDao.insert(new Timetable(i, day.get(j).getTime(), day.get(j).getMark()));
         }
@@ -133,6 +134,7 @@ public class TimetableMaker {
         plusMonth.add(Calendar.MONTH, 1); // дата через месяц
         int nowTime = c.get(Calendar.HOUR_OF_DAY)*60 + c.get(Calendar.MINUTE);
 
+        ttCompleteDao.deleteCurrentTimetable(c.getTimeInMillis(), plusMonth.getTimeInMillis());
         //byte j = 0;
         while (!c.after(plusMonth)) {
             int dayNumber = (c.get(Calendar.DAY_OF_WEEK)-1 > 0) ? c.get(Calendar.DAY_OF_WEEK)-1 : 7; // находим день недели текущей даты
@@ -154,21 +156,6 @@ public class TimetableMaker {
             // переходим к сл дню - увеличиваем переменную цикла
             c.add(Calendar.DATE, 1); // переходим к сл дню
         }
-        /*
-        for (int i = 0; i < day.size(); i++) {
-            if (day.get(i).mark > -1)
-                Log.d(MEALTIME, "Время " + getHours(day.get(i).time) + ":" + getMinutes(day.get(i).time) +
-                            "; Лекарство " + day.get(i).mark);
-            else
-                Log.d(MEALTIME, "Время " + getHours(day.get(i).time) + ":" + getMinutes(day.get(i).time) +
-                        "; Приём пищи");
-        }
-        */
-
-    }
-
-    public void populateTTComplete () {
-
     }
 
     public void setMealTime(){
