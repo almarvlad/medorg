@@ -21,4 +21,7 @@ public interface TimetableDao {
 
     @Query("DELETE FROM timetable")
     void deleteTimetable();
+
+    @Query("DELETE FROM timetable WHERE mark = :id")
+    void deleteMedFromTimetable(long id);
 }

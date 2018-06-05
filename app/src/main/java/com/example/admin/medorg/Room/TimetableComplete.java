@@ -4,12 +4,14 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 @Entity
 public class TimetableComplete {
     public TimetableComplete(long dateTime, @NonNull int idMed) {
         this.dateTime = dateTime;
         this.idMed = idMed;
+        completion = -1;
     }
 
     @PrimaryKey(autoGenerate = true)
@@ -24,7 +26,8 @@ public class TimetableComplete {
     @ColumnInfo(name = "id_med")
     private int idMed;
 
-    private boolean completion;
+    @Nullable
+    private int completion;
 
     @NonNull
     public int getId() { return id; }
@@ -37,7 +40,7 @@ public class TimetableComplete {
     public int getIdMed() { return idMed; }
     public void setIdMed(@NonNull int idMed) { this.idMed = idMed; }
 
-    @NonNull
-    public boolean isCompletion() { return completion; }
-    public void setCompletion(@NonNull boolean completion) { this.completion = completion; }
+    @Nullable
+    public int getCompletion() { return completion; }
+    public void setCompletion(@NonNull int completion) { this.completion = completion; }
 }

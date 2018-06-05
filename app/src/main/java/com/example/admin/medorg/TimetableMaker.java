@@ -1,8 +1,12 @@
 package com.example.admin.medorg;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
@@ -49,10 +53,13 @@ public class TimetableMaker {
     private static final String TAG = "SET_PRIORITY";
     private static final String MEALTIME = "MEALTIME";
 
+    Context context;
+
     //private TimetableViewModel mTimetableViewModel;
 
     public TimetableMaker(Context cntxt) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(cntxt);
+        context = cntxt;
         mealCount = Integer.parseInt(prefs.getString("meal_count", "3"));
         db = prefs.getInt("day_begin", 360);
         de = prefs.getInt("day_end", 1320);
@@ -130,7 +137,7 @@ public class TimetableMaker {
         }
 
         Calendar c = Calendar.getInstance(); // текущая дата
-        Calendar plusMonth = Calendar.getInstance();;
+        Calendar plusMonth = Calendar.getInstance();
         plusMonth.add(Calendar.MONTH, 1); // дата через месяц
         int nowTime = c.get(Calendar.HOUR_OF_DAY)*60 + c.get(Calendar.MINUTE);
 
@@ -145,6 +152,23 @@ public class TimetableMaker {
                 Calendar timeTakeMed = new GregorianCalendar(c.get(Calendar.YEAR), c.get(Calendar.MONTH),
                         c.get(Calendar.DAY_OF_MONTH), getHours(dayTimetable.get(i).getTime()), getMinutes(dayTimetable.get(i).getTime()));
                 ttCompleteDao.insert(new TimetableComplete(timeTakeMed.getTimeInMillis(), dayTimetable.get(i).getMark()));
+
+                /*
+                AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                Intent intent = new Intent(context, AlarmReceiver.class);
+                intent.putExtra("alarm message", "alarm message");
+                PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pi);
+                }
+                else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    am.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pi);
+                }
+                else {
+                    am.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pi);
+                }
+                */
+
             }
             //текущая дата в цикле
             Calendar date_one = new GregorianCalendar(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), 0, 0, 0);

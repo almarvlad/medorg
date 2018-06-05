@@ -12,6 +12,7 @@ import java.util.List;
 public class MedRepo {
     public MedicineDao mMedicineDao;
     public TimetableDao mTimetableDao;
+    public TimetableCompleteDao mTimetableCompleteDao;
 
     private LiveData<List<UserMedicine>> mAllMeds;
     private LiveData<List<Timetable>> timetableList;
@@ -29,6 +30,7 @@ public class MedRepo {
         mTimetableDao = db.ttDao();
         timetableList = mTimetableDao.getTimetable();
 
+        mTimetableCompleteDao = db.ttCompleteDao();
         ttmaker = new TimetableMaker(application);
     }
 
@@ -47,7 +49,7 @@ public class MedRepo {
     }*/
 
     public void deleteMed(long id) {
-        new deleteMedAsyncTask(mMedicineDao, id).execute();
+        new deleteMedAsyncTask(mMedicineDao, mTimetableDao, mTimetableCompleteDao, id).execute();
     }
 
     // добавление в словарь
@@ -97,10 +99,14 @@ public class MedRepo {
     // удаление из словаря
     private static class deleteMedAsyncTask extends AsyncTask<Void, Void, String> {
         private final MedicineDao mAsyncTaskDao;
+        private final TimetableDao ttDao;
+        private final TimetableCompleteDao ttCompleteDao;
         private long id;
 
-        deleteMedAsyncTask(MedicineDao dao, long id) {
+        deleteMedAsyncTask(MedicineDao dao, TimetableDao ttDao, TimetableCompleteDao ttCompleteDao, long id) {
             mAsyncTaskDao = dao;
+            this.ttDao = ttDao;
+            this.ttCompleteDao = ttCompleteDao;
             this.id = id;
         }
         @Override
@@ -108,6 +114,8 @@ public class MedRepo {
             String r = mAsyncTaskDao.getById(id).getName();
             mAsyncTaskDao.deleteMed(id);
             mAsyncTaskDao.deleteNoncompatMed(id);
+            ttDao.deleteMedFromTimetable(id);
+            ttCompleteDao.deleteMedFromTimetableComplete(id);
             return r;
         }
     }

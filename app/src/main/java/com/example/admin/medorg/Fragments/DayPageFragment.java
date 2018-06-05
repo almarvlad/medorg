@@ -1,5 +1,6 @@
 package com.example.admin.medorg.Fragments;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.example.admin.medorg.MedInfo;
 import com.example.admin.medorg.R;
 import com.example.admin.medorg.Room.AppDatabase;
 import com.example.admin.medorg.Room.MedicineDao;
+import com.example.admin.medorg.Room.Timetable;
 import com.example.admin.medorg.Room.TimetableComplete;
 import com.example.admin.medorg.Room.TimetableCompleteDao;
 
@@ -39,6 +41,8 @@ public class DayPageFragment extends Fragment {
 
     AppDatabase adb;
     TimetableCompleteDao ttCompleteDao;
+
+    RecyclerView recyclerView;
 
     int pageNumber;
 
@@ -64,6 +68,18 @@ public class DayPageFragment extends Fragment {
         //Log.d(TAG, "savedPageNumber = " + savedPageNumber);
     }
 
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == getActivity().RESULT_OK) {
+            recyclerView.getAdapter().notifyDataSetChanged();
+        } else
+            super.onActivityResult(requestCode, resultCode, data);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.timetable_day, null);
@@ -75,27 +91,26 @@ public class DayPageFragment extends Fragment {
         adb = AppDatabase.getDatabase(getContext());
         ttCompleteDao = adb.ttCompleteDao();
 
-        RecyclerView recyclerView = view.findViewById(R.id.timetable_page); // наш список cardview для графика приёма
+        recyclerView = view.findViewById(R.id.timetable_page); // наш список cardview для графика приёма
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         Calendar date_one = Calendar.getInstance();
         date_one.setTimeInMillis(getArguments().getLong(DATE_IN_MILLIS));
         Calendar date_two = new GregorianCalendar(date_one.get(Calendar.YEAR), date_one.get(Calendar.MONTH), date_one.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
         date_two.add(Calendar.DATE, 1);
-        Date d1 = new Date(date_one.getTimeInMillis());
-        Date d2 = new Date(date_two.getTimeInMillis());
+        //Date d1 = new Date(date_one.getTimeInMillis());
+        //Date d2 = new Date(date_two.getTimeInMillis());
         List<TimeMarkLong> listTime = new ArrayList<TimeMarkLong>();
         listTime = ttCompleteDao.getDistinctTimeList(date_one.getTimeInMillis(), date_two.getTimeInMillis());
-        List<TimetableComplete> listMedsTime = ttCompleteDao.getTimetableByDate(date_one.getTimeInMillis(), date_two.getTimeInMillis());
+
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         int mealCount = Integer.parseInt(prefs.getString("meal_count", "3"));
 
-
         if (listTime.size() > mealCount) {
             title.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
-            final TimetableRVAdapter adapter = new TimetableRVAdapter(getContext(), listTime, listMedsTime);
+            final TimetableRVAdapter adapter = new TimetableRVAdapter(getContext(), listTime, date_one, date_two);
             recyclerView.setAdapter(adapter);
         }
         return view;

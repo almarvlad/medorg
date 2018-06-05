@@ -34,6 +34,17 @@ public interface TimetableCompleteDao {
             "ORDER BY date_time")
     List<DayPageFragment.TimeMarkLong> getDistinctTimeList(long date_one, long date_two);
 
+    @Query("DELETE FROM TimetableComplete WHERE id_med = :id AND completion < 1")
+    void deleteMedFromTimetableComplete(long id);
+
+    @Query("UPDATE TimetableComplete SET completion = :comp WHERE date_time = :dateTime")
+    void updateAllatTime(int comp, long dateTime);
+
+    @Query("UPDATE TimetableComplete SET completion = :comp WHERE date_time = :dateTime AND id_med = :id")
+    void updateOneatTime(int comp, long dateTime, long id);
+
+    @Query("SELECT * FROM TimetableComplete WHERE (id_med > -1) AND date_time = :exactTime")
+    List<TimetableComplete> selectMedsAtTime(long exactTime);
 /*
     SELECT time, mark
         FROM   timetable s1
