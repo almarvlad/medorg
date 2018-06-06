@@ -1,11 +1,7 @@
 package com.example.admin.medorg;
 
 import android.app.DatePickerDialog;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.DialogFragment;
@@ -26,14 +22,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.admin.medorg.Fragments.DatePickerfragment;
-import com.example.admin.medorg.Fragments.FragmentMeds;
-import com.example.admin.medorg.Room.AppDatabase;
-import com.example.admin.medorg.Room.DBDao;
 import com.example.admin.medorg.Room.MedicineViewModel;
-import com.example.admin.medorg.Room.NonCompatMeds;
 import com.example.admin.medorg.Room.UserMedicine;
 
 import java.text.DateFormat;
@@ -295,13 +286,13 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
                     RadioGroup rdg_timetype = (RadioGroup) findViewById(R.id.time_rdg);
                     int tt = rdg_timetype.indexOfChild(findViewById(rdg_timetype.getCheckedRadioButtonId()));
                     boolean timetype;
-                    float t;
+                    int t;
                     if (tt == 0) {
                         timetype = false; // N раз в день (частота)
-                        t = Float.parseFloat(editTimeFreq.getText().toString());
+                        t = Integer.parseInt(editTimeFreq.getText().toString());
                     } else {
                         timetype = true;  // Каждые N часов (инервалы)
-                        t = Float.parseFloat(editTimeInt.getText().toString());
+                        t = Integer.parseInt(editTimeInt.getText().toString());
                     }
                     // узнаём инструкции
                     // 0 - до еды
@@ -313,9 +304,9 @@ public class MedEdit extends AppCompatActivity implements DatePickerDialog.OnDat
 
                     // добавляем новый объект-запись о лекарстве
                     UserMedicine med = new UserMedicine(editMedName.getText().toString(), t,
-                            c.getTime().getTime(), timetype, num, Float.parseFloat(editDose.getText().toString()),
+                            c.getTime().getTime(), timetype, num, editDose.getText().toString(),
                             spinFormDose.getSelectedItem().toString(), instr, add_instr.getText().toString(),
-                            daysCount, true);
+                            daysCount, true, noncompatID!=null);
                     mMedicineViewModel.insert(med, noncompatID);
 
                     Log.d("SAVE_MED", "name: " + med.getName() +

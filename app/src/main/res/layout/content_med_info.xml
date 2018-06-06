@@ -6,114 +6,117 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:fillViewport="true"
     tools:context=".MedInfo"
     tools:showIn="@layout/activity_med_info">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="16dp"
-            android:paddingTop="12dp"
             android:orientation="vertical">
-            <TextView
-                style="@style/MedInfoSubtitle"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/info_time_title" >
-            </TextView>
-            <TextView
-                style="@style/MedInfoTextElements"
-                android:id="@+id/info_days"
-                android:layout_width="wrap_content"
+                android:paddingBottom="16dp"
+                android:paddingTop="12dp"
+                android:orientation="vertical">
+                <TextView
+                    style="@style/MedInfoSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/info_time_title" >
+                </TextView>
+                <TextView
+                    style="@style/MedInfoTextElements"
+                    android:id="@+id/info_days"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+                <TextView
+                    style="@style/MedInfoTextElements"
+                    android:id="@+id/info_frequency"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+                </TextView>
+                <TextView
+                    style="@style/MedInfoTextElements"
+                    android:id="@+id/info_dose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/info_block_instruct"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="каждый день">
-            </TextView>
-            <TextView
-                style="@style/MedInfoTextElements"
-                android:id="@+id/info_frequency"
-                android:layout_width="wrap_content"
+                android:paddingBottom="16dp"
+                android:orientation="vertical">
+                <View
+                    android:id="@+id/divider1"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider"
+                    android:layout_marginBottom="12dp" />
+                <TextView
+                    style="@style/MedInfoSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/info_insctructions" >
+                </TextView>
+                <TextView
+                    style="@style/MedInfoTextElements"
+                    android:id="@+id/info_food_instruct"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+                <TextView
+                    style="@style/MedInfoTextElements"
+                    android:id="@+id/info_add_insctruct"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </TextView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/info_block_noncompat"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2 раза в сутки" >
-            </TextView>
-            <TextView
-                style="@style/MedInfoTextElements"
-                android:id="@+id/info_dose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2 табл.">
-            </TextView>
+                android:paddingBottom="16dp"
+                android:orientation="vertical">
+                <View
+                    android:id="@+id/divider2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider"
+                    android:layout_marginBottom="12dp" />
+                <TextView
+                    style="@style/MedInfoSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Несовместимые" >
+                </TextView>
+                <TextView
+                    style="@style/MedInfoTextElements"
+                    android:id="@+id/info_nc_meds"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ЛекарстваЛекарстваЛекарстваЛекарстваЛекарстваЛекарстваЛекарства">
+                </TextView>
+            </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/info_block_instruct"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="16dp"
-            android:orientation="vertical">
-            <View
-                android:id="@+id/divider1"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?android:attr/listDivider"
-                android:layout_marginBottom="12dp" />
-            <TextView
-                style="@style/MedInfoSubtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/info_insctructions" >
-            </TextView>
-            <TextView
-                style="@style/MedInfoTextElements"
-                android:id="@+id/info_food_instruct"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="до еды">
-            </TextView>
-            <TextView
-                style="@style/MedInfoTextElements"
-                android:id="@+id/info_add_insctruct"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="запивать водой">
-            </TextView>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/info_block_noncompat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="16dp"
-            android:orientation="vertical">
-            <View
-                android:id="@+id/divider2"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?android:attr/listDivider"
-                android:layout_marginBottom="12dp" />
-            <TextView
-                style="@style/MedInfoSubtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Несовместимые" >
-            </TextView>
-            <TextView
-                style="@style/MedInfoTextElements"
-                android:id="@+id/info_nc_meds"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ЛекарстваЛекарстваЛекарстваЛекарстваЛекарстваЛекарстваЛекарства">
-            </TextView>
-        </LinearLayout>
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            android:layout_alignParentBottom="true"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
@@ -146,5 +149,5 @@
         </android.support.constraint.ConstraintLayout>
 
 
-    </LinearLayout>
+    </RelativeLayout>
 </ScrollView>

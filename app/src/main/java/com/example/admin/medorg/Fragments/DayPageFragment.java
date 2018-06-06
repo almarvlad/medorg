@@ -1,8 +1,11 @@
 package com.example.admin.medorg.Fragments;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,25 +16,41 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.admin.medorg.MedInfo;
 import com.example.admin.medorg.R;
+import com.example.admin.medorg.Room.AppDatabase;
+import com.example.admin.medorg.Room.MedicineDao;
+import com.example.admin.medorg.Room.Timetable;
+import com.example.admin.medorg.Room.TimetableComplete;
+import com.example.admin.medorg.Room.TimetableCompleteDao;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 
 public class DayPageFragment extends Fragment {
     static final String ARGUMENT_PAGE_NUMBER = "arg_page_number";
     static final String SAVE_PAGE_NUMBER = "save_page_number";
+    static final String DATE_IN_MILLIS = "save_page_number";
 
     private static final String TAG = "TT_VIEWPAGER";
     private static final String tt = "TT_RW";
 
+    AppDatabase adb;
+    TimetableCompleteDao ttCompleteDao;
+
+    RecyclerView recyclerView;
+
     int pageNumber;
 
-    static DayPageFragment newInstance(int page) {
+    static DayPageFragment newInstance(int page, Calendar d) {
         DayPageFragment DayPageFragment = new DayPageFragment();
         Bundle arguments = new Bundle();
         arguments.putInt(ARGUMENT_PAGE_NUMBER, page);
+        arguments.putLong(DATE_IN_MILLIS, d.getTimeInMillis()); // записываем дату для данного фрагмента в аргументы
         DayPageFragment.setArguments(arguments);
         return DayPageFragment;
     }
@@ -49,23 +68,78 @@ public class DayPageFragment extends Fragment {
         //Log.d(TAG, "savedPageNumber = " + savedPageNumber);
     }
 
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == getActivity().RESULT_OK) {
+            recyclerView.getAdapter().notifyDataSetChanged();
+        } else
+            super.onActivityResult(requestCode, resultCode, data);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.timetable_day, null);
+
+        TextView title = (TextView) view.findViewById(R.id.no_med_takes);
+
         View cardview = inflater.inflate(R.layout.timetable_element, null);
 
-        RecyclerView recyclerView = view.findViewById(R.id.timetable_page); // наш список cardview для графика приёма
+        adb = AppDatabase.getDatabase(getContext());
+        ttCompleteDao = adb.ttCompleteDao();
+
+        recyclerView = view.findViewById(R.id.timetable_page); // наш список cardview для графика приёма
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        ArrayList<String> exampleTime = new ArrayList<String>(3);
-        exampleTime.add("12:30");
-        exampleTime.add("13:30");
-        exampleTime.add("18:30");
+        Calendar date_one = Calendar.getInstance();
+        date_one.setTimeInMillis(getArguments().getLong(DATE_IN_MILLIS));
+        Calendar date_two = new GregorianCalendar(date_one.get(Calendar.YEAR), date_one.get(Calendar.MONTH), date_one.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+        date_two.add(Calendar.DATE, 1);
+        //Date d1 = new Date(date_one.getTimeInMillis());
+        //Date d2 = new Date(date_two.getTimeInMillis());
+        List<TimeMarkLong> listTime = new ArrayList<TimeMarkLong>();
+        listTime = ttCompleteDao.getDistinctTimeList(date_one.getTimeInMillis(), date_two.getTimeInMillis());
 
-        final TimetableRVAdapter adapter = new TimetableRVAdapter(getContext(), exampleTime);
-        recyclerView.setAdapter(adapter);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        int mealCount = Integer.parseInt(prefs.getString("meal_count", "3"));
+
+        if (listTime.size() > mealCount) {
+            title.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            final TimetableRVAdapter adapter = new TimetableRVAdapter(getContext(), listTime, date_one, date_two);
+            recyclerView.setAdapter(adapter);
+        }
         return view;
+    }
+
+    public static class TimeMarkLong {
+        private long date_time;
+        private int id_med; // id лекарства
+
+        public TimeMarkLong(long date_time, int id_med) {
+            this.date_time = date_time;
+            this.id_med = id_med;
+        }
+
+        public long getDate_time() {
+            return date_time;
+        }
+
+        public void setDate_time(long date_time) {
+            this.date_time = date_time;
+        }
+
+        public int getId_med() {
+            return id_med;
+        }
+
+        public void setId_med(int id_med) {
+            this.id_med = id_med;
+        }
     }
 
     @Override

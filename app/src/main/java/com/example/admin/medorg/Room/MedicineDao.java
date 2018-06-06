@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Dao
-public interface DBDao {
+public interface MedicineDao {
     @Query("SELECT * FROM medicals")
     LiveData<List<UserMedicine>> getAllMeds();
 
@@ -21,7 +21,10 @@ public interface DBDao {
     List<NonCompatMeds> getNoncompat(long id);
 
     @Query("SELECT * FROM medicals WHERE isActive=1")
-    ArrayList<UserMedicine> getActiveMeds();
+    List<UserMedicine> getActiveMeds();
+
+    @Query("SELECT * FROM medicals")
+    List<UserMedicine> getAllMedsAL();
 
     @Insert
     long insert(UserMedicine userMedicine);

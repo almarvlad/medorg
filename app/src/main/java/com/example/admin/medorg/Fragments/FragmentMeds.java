@@ -2,30 +2,22 @@ package com.example.admin.medorg.Fragments;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.persistence.room.Room;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.admin.medorg.MedEdit;
 import com.example.admin.medorg.R;
-import com.example.admin.medorg.Room.AppDatabase;
-import com.example.admin.medorg.Room.DBDao;
 import com.example.admin.medorg.Room.MedicineViewModel;
 import com.example.admin.medorg.Room.UserMedicine;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

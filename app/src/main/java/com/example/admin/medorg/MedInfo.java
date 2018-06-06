@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,7 +16,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.admin.medorg.Room.AppDatabase;
-import com.example.admin.medorg.Room.DBDao;
+import com.example.admin.medorg.Room.MedicineDao;
 import com.example.admin.medorg.Room.MedicineViewModel;
 import com.example.admin.medorg.Room.NonCompatMeds;
 import com.example.admin.medorg.Room.UserMedicine;
@@ -32,7 +31,7 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
     public String[] weekdays_list;
 
     AppDatabase adb;
-    DBDao dao;
+    MedicineDao dao;
 
     private TextToSpeech mTTS;
     private FloatingActionButton fab;
@@ -120,20 +119,20 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
         textView.setText(med.getDose() + " " + med.getDoseForm());
 
         View i = findViewById(R.id.info_block_instruct);
-        Log.d("MED_INFO", ""+med.getAddInstruct().equals(""));
         if (med.getInstruct()==3 && med.getAddInstruct().equals("")) // если не важна сочетаемость с пищей и нет доп инструкций
             i.setVisibility(View.GONE);                         // тогда убираем блок с инструкциями
         else {
-            textView = (TextView) findViewById(R.id.info_food_instruct);
+            TextView textViewFood = (TextView) findViewById(R.id.info_food_instruct);
             // если есть сочетаемость с пищей
-            if (med.getInstruct()<3)
-                textView.setText(setFoodInstructInfo(med.getInstruct()));
-            else textView.setVisibility(View.GONE);
+            if (med.getInstruct()<3) {
+                textViewFood.setText(setFoodInstructInfo(med.getInstruct()));
+            }
+            else textViewFood.setVisibility(View.GONE);
             // если есть доп инструкции
+            textView = (TextView) findViewById(R.id.info_add_insctruct);
             if (med.getAddInstruct().equals(""))
                 textView.setVisibility(View.GONE);
             else {
-                textView = (TextView) findViewById(R.id.info_add_insctruct);
                 textView.setText(med.getAddInstruct());
             }
         }
@@ -149,7 +148,7 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
 
     // false - частота (Н раз(а) в день)
     // true - интервалы (каждые H часов)
-    public String setIntervalInfo (boolean type, float per) {
+    public String setIntervalInfo (boolean type, int per) {
         String res;
         if (!type) {
             if ((per > 1)&&(per < 5))
@@ -181,6 +180,7 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
     }
 
     public String setFoodInstructInfo(byte instr){
+        Log.d("MED_INFO", "setFoodInstructInfo " + instr);
         String res;
         switch (instr) {
             case 0:

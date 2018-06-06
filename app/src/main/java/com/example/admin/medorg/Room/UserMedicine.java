@@ -11,9 +11,9 @@ import java.util.Date;
 
 @Entity(tableName = "medicals")
 public class UserMedicine {
-    public UserMedicine(String name, float timePer, long courseStart,
-                        boolean timeType, String weekdays, float dose, String doseForm,
-                        byte instruct, String addInstruct, int duration, boolean active) {
+    public UserMedicine(String name, int timePer, long courseStart,
+                        boolean timeType, String weekdays, String dose, String doseForm,
+                        byte instruct, String addInstruct, int duration, boolean active, boolean hasNoncompat) {
         this.name = name;
         this.timePer = timePer;
         this.courseStart = courseStart;
@@ -25,6 +25,11 @@ public class UserMedicine {
         this.addInstruct = addInstruct;
         this.duration = duration;
         this.isActive = active;
+        this.hasNoncompat = hasNoncompat;
+    }
+
+    public void setID(@NonNull long ID) {
+        this.ID = ID;
     }
 
     @PrimaryKey(autoGenerate = true)
@@ -38,21 +43,21 @@ public class UserMedicine {
 
     @ColumnInfo(name = "med_name")
     @NonNull
-    private String name;
+    private String name; // название лекарства
 
-    public float getTimePer() {
+    public int getTimePer() {
         return timePer;
     }
 
-    public void setTimePer(float timePer) {
+    public void setTimePer(int timePer) {
         this.timePer = timePer;
     }
 
     @ColumnInfo(name = "time_per")
-    private float timePer;
+    private int timePer; // каждые н часов, н раз в день
 
     @ColumnInfo(name = "course_start")
-    private long courseStart;
+    private long courseStart; // начало курса
 
     public long getCourseStart() {
         return courseStart;
@@ -78,11 +83,11 @@ public class UserMedicine {
         this.weekdays = weekdays;
     }
 
-    public float getDose() {
+    public String getDose() {
         return dose;
     }
 
-    public void setDose(float dose) {
+    public void setDose(String dose) {
         this.dose = dose;
     }
 
@@ -118,16 +123,26 @@ public class UserMedicine {
         isActive = active;
     }
 
-    private int duration;
-    private String weekdays;
-    private float dose;
+    private int duration; // продолжительность курса // 0 нет фикс продолжительности
+    private String weekdays; // в какие дни недели
+    private String dose;
     private String doseForm;
-    private byte instruct;
+    private byte instruct; // зависимость от еды
 
     @Nullable
     private String addInstruct;
     @Nullable
     private boolean isActive;
+
+    public boolean isHasNoncompat() {
+        return hasNoncompat;
+    }
+
+    public void setHasNoncompat(boolean hasNoncompat) {
+        this.hasNoncompat = hasNoncompat;
+    }
+
+    private boolean hasNoncompat;
 
     //0 - частота (Н раз в день), 1 - интервалы (каждые Н часов)
     public boolean isTimeType() {
@@ -139,10 +154,6 @@ public class UserMedicine {
     }
 
     private boolean timeType;
-
-    public void setID(@NonNull long ID) {
-        this.ID = ID;
-    }
 
     public String getName() {
         return name;

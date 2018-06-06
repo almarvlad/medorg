@@ -5,7 +5,6 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MedicineViewModel extends AndroidViewModel {
@@ -20,8 +19,8 @@ public class MedicineViewModel extends AndroidViewModel {
         super(app);
         mRepository = new MedRepo(app);
         mAllMeds = mRepository.getAllMeds();
-        medsCount = mRepository.mDBDao.medsCount();
-        medsAL = mRepository.mDBDao.getAllMedsAL();
+        medsCount = mRepository.mMedicineDao.medsCount();
+        medsAL = mRepository.mMedicineDao.getAllMedsAL();
     }
 
     public LiveData<List<UserMedicine>> getAllMeds() { return mAllMeds; }

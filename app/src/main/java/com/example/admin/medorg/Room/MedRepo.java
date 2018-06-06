@@ -5,42 +5,65 @@ import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.admin.medorg.TimetableMaker;
+
 import java.util.List;
 
 public class MedRepo {
-    public DBDao mDBDao;
+    public MedicineDao mMedicineDao;
+    public TimetableDao mTimetableDao;
+    public TimetableCompleteDao mTimetableCompleteDao;
+
     private LiveData<List<UserMedicine>> mAllMeds;
+    private LiveData<List<Timetable>> timetableList;
+
     public static Long res;
+    TimetableMaker ttmaker;
+    private static final String TAG = "SET_PRIORITY";
+
 
     MedRepo(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
-        mDBDao = db.Dao();
-        mAllMeds = mDBDao.getAllMeds();
+        mMedicineDao = db.Dao();
+        mAllMeds = mMedicineDao.getAllMeds();
+
+        mTimetableDao = db.ttDao();
+        timetableList = mTimetableDao.getTimetable();
+
+        mTimetableCompleteDao = db.ttCompleteDao();
+        ttmaker = new TimetableMaker(application);
     }
 
     LiveData<List<UserMedicine>> getAllMeds() {
         return mAllMeds;
     }
+    LiveData<List<Timetable>> getTimetableList() { return timetableList; }
 
     public void insert (UserMedicine userMed, long[] noncompat) {
-        new insertAsyncTask(mDBDao, userMed, noncompat).execute();
+        new insertAsyncTask(mMedicineDao, userMed, noncompat, ttmaker).execute();
     }
 
+    /*
+    public void insertTimetable (Timetable timetable) {
+        new insertAsyncTask(mMedicineDao, userMed, noncompat, ttmaker).execute();
+    }*/
+
     public void deleteMed(long id) {
-        Log.d("MED_INFO", "вызван AsyncTask для удаления");
-        new deleteMedAsyncTask(mDBDao, id).execute();
+        new deleteMedAsyncTask(mMedicineDao, mTimetableDao, mTimetableCompleteDao, id).execute();
     }
 
     // добавление в словарь
     private static class insertAsyncTask extends AsyncTask<UserMedicine, Void, Long> {
-        private final DBDao mAsyncTaskDao;
+        private final MedicineDao mAsyncTaskDao;
         private UserMedicine umed;
         private long[] nc;
+        private TimetableMaker ttMaker;
 
-        insertAsyncTask(DBDao dao, UserMedicine umed, long[] nonc) {
+        insertAsyncTask(MedicineDao dao, UserMedicine umed, long[] nonc, TimetableMaker tm) {
             mAsyncTaskDao = dao;
             this.umed = umed;
             this.nc = nonc;
+            ttMaker = tm;
         }
 
         @Override
@@ -48,6 +71,7 @@ public class MedRepo {
             Long r = mAsyncTaskDao.insert(umed);
             res = r;
             Log.d("SAVE_MED", "last id: "+r);
+            Log.d(TAG, "Saving med info in background ...");
 
             if (nc != null) { //если есть список несовместимых лекарств
                 if (nc.length>0){ //точно, что этот список есть и его длина не равна 0
@@ -57,32 +81,41 @@ public class MedRepo {
                     }
                 }
             }
+
+            Log.d(TAG, "Call SetPriority method ...");
+            ttMaker.setPriority();
+            ttMaker.setTimeAllMeds();
+            ttMaker.sortAndSaveTimetable();
+
             return r;
         }
 
         protected void onPostExecute(Long result) {
             res = result;
-            Log.d("SAVE_MED", "res: "+result);
+
         }
     }
 
     // удаление из словаря
     private static class deleteMedAsyncTask extends AsyncTask<Void, Void, String> {
-        private final DBDao mAsyncTaskDao;
+        private final MedicineDao mAsyncTaskDao;
+        private final TimetableDao ttDao;
+        private final TimetableCompleteDao ttCompleteDao;
         private long id;
 
-        deleteMedAsyncTask(DBDao dao, long id) {
+        deleteMedAsyncTask(MedicineDao dao, TimetableDao ttDao, TimetableCompleteDao ttCompleteDao, long id) {
             mAsyncTaskDao = dao;
+            this.ttDao = ttDao;
+            this.ttCompleteDao = ttCompleteDao;
             this.id = id;
         }
-
         @Override
         protected String doInBackground(Void... params) {
             String r = mAsyncTaskDao.getById(id).getName();
-            Log.d("MED_INFO", "Фоновый процесс по удалению из бд");
             mAsyncTaskDao.deleteMed(id);
             mAsyncTaskDao.deleteNoncompatMed(id);
-            Log.d("MED_INFO", "Лекарство с id " + id + " удалено");
+            ttDao.deleteMedFromTimetable(id);
+            ttCompleteDao.deleteMedFromTimetableComplete(id);
             return r;
         }
     }

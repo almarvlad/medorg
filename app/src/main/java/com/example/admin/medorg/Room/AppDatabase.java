@@ -9,10 +9,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
-@Database(entities = {UserMedicine.class, NonCompatMeds.class}, version = 3)
+@Database(entities = {UserMedicine.class, NonCompatMeds.class, Timetable.class, TimetableComplete.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public abstract DBDao Dao();
+    public abstract MedicineDao Dao();
+    public abstract TimetableDao ttDao();
+    public abstract TimetableCompleteDao ttCompleteDao();
     private static AppDatabase INSTANCE; // объект базы данных, который должен оставаться в единственном экземпляре
 
     public static AppDatabase getDatabase(final Context context) {
@@ -42,10 +44,14 @@ public abstract class AppDatabase extends RoomDatabase {
             };
 
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
-        private final DBDao mDao;
+        private final MedicineDao mDao;
+        private final TimetableDao ttDao;
+        private final TimetableCompleteDao ttCompleteDao;
 
         PopulateDbAsync(AppDatabase db) {
             mDao = db.Dao();
+            ttDao = db.ttDao();
+            ttCompleteDao = db.ttCompleteDao();
         }
 
         @Override
@@ -62,11 +68,12 @@ public abstract class AppDatabase extends RoomDatabase {
                     " course_start,LONG;" +
                     " Duration,INTEGER;" +
                     " Weekdays,VARCHAR(7);" +
-                    " Dose,REAL;" +
+                    " Dose,INTEGER;" +
                     " DoseForm,VARCHAR;" +
                     " Instruct,TINYINT;" +
                     " AddInstruct,VARCHAR(255);" +
-                    " IsActive,BOOLEAN DEFAULT 0 NOT NULL");
+                    " IsActive,BOOLEAN DEFAULT 0 NOT NULL;" +
+                    " hasNoncompat,BOOLEAN");
         }
     };
     public static final Migration MIGRATION_2_3 = new Migration(2, 3) {
