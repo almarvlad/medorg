@@ -10,8 +10,12 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -82,7 +86,26 @@ public class FragmentTimetable extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        //Менять заголовок
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("График приёма");
+        setHasOptionsMenu(true);
         //
+    }
+
+    // "меню" нужно поменять
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Log.d("MED_INFO", "Нажата кнопка рассчитать");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

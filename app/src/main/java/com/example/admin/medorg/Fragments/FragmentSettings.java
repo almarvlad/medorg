@@ -2,6 +2,7 @@ package com.example.admin.medorg.Fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.LayoutInflater;
@@ -17,6 +18,9 @@ public class FragmentSettings extends PreferenceFragmentCompat {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Менять заголовок
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Настройки");
+        setHasOptionsMenu(false);
     }
 
     @Override
