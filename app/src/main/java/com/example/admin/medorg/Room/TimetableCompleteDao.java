@@ -45,6 +45,9 @@ public interface TimetableCompleteDao {
 
     @Query("SELECT * FROM TimetableComplete WHERE (id_med > -1) AND date_time = :exactTime")
     List<TimetableComplete> selectMedsAtTime(long exactTime);
+
+    @Query("SELECT date_time FROM TimetableComplete WHERE (date_time > :currTime) ORDER BY date_time LIMIT 1")
+    long nextAlarmTime(long currTime);
 /*
     SELECT time, mark
         FROM   timetable s1

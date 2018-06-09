@@ -54,6 +54,8 @@ public class TimetableMaker {
     private static final String MEALTIME = "MEALTIME";
 
     Context context;
+    AlarmManager am;
+    PendingIntent pi;
 
     //private TimetableViewModel mTimetableViewModel;
 
@@ -153,22 +155,6 @@ public class TimetableMaker {
                         c.get(Calendar.DAY_OF_MONTH), getHours(dayTimetable.get(i).getTime()), getMinutes(dayTimetable.get(i).getTime()));
                 ttCompleteDao.insert(new TimetableComplete(timeTakeMed.getTimeInMillis(), dayTimetable.get(i).getMark()));
 
-                /*
-                AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                Intent intent = new Intent(context, AlarmReceiver.class);
-                intent.putExtra("alarm message", "alarm message");
-                PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pi);
-                }
-                else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    am.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pi);
-                }
-                else {
-                    am.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pi);
-                }
-                */
-
             }
             //текущая дата в цикле
             Calendar date_one = new GregorianCalendar(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
@@ -179,6 +165,24 @@ public class TimetableMaker {
 
             // переходим к сл дню - увеличиваем переменную цикла
             c.add(Calendar.DATE, 1); // переходим к сл дню
+        }
+        final Calendar curr = Calendar.getInstance();
+        am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        final Intent intent = new Intent(context, AlarmReceiver.class);
+        //intent.putExtra("alarm message", "alarm message");
+        pi = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Date currtime = new Date(curr.getTimeInMillis());
+        long ct = curr.getTimeInMillis();
+        Date nexttime = new Date(ttCompleteDao.nextAlarmTime(curr.getTimeInMillis()));
+        long nt = ttCompleteDao.nextAlarmTime(curr.getTimeInMillis());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, ttCompleteDao.nextAlarmTime(curr.getTimeInMillis()), pi);
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            am.setExact(AlarmManager.RTC_WAKEUP, ttCompleteDao.nextAlarmTime(curr.getTimeInMillis()), pi);
+        }
+        else {
+            am.set(AlarmManager.RTC_WAKEUP, ttCompleteDao.nextAlarmTime(curr.getTimeInMillis()), pi);
         }
     }
 

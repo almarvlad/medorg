@@ -3,12 +3,15 @@ package com.example.admin.medorg.Fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.admin.medorg.MainActivity;
@@ -19,26 +22,40 @@ import com.example.admin.medorg.Room.TimetableCompleteDao;
 import com.example.admin.medorg.Room.UserMedicine;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 import fr.tvbarthel.lib.blurdialogfragment.SupportBlurDialogFragment;
 
-public class TakeMedDialogFragment extends SupportBlurDialogFragment {
+public class TakeMedDialogFragment extends SupportBlurDialogFragment implements TextToSpeech.OnInitListener {
     private static Calendar time = Calendar.getInstance();
     private static String timeStr;
     private static UserMedicine umed;
-    private static int position;
+
+    private TextToSpeech mTTS;
+    private ImageButton play;
 
     Button skip, take;
 
     static AppDatabase adb;
     static TimetableCompleteDao ttCompleteDao;
 
-    static RecyclerView recyclerView;
-
     private Listener mListener;
 
     public void setListener(Listener listener) {
         mListener = listener;
+    }
+
+    @Override
+    public void onInit(int status) {
+        // TODO Auto-generated method stub
+        if (status == TextToSpeech.SUCCESS) {
+            Locale locale = new Locale("ru");
+            int result = mTTS.setLanguage(locale);
+            //int result = mTTS.setLanguage(Locale.getDefault());
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "Извините, этот язык не поддерживается");
+            } else { play.setEnabled(true); }
+        } else { Log.e("TTS", "Ошибка!"); }
     }
 
     static interface Listener {
@@ -74,12 +91,6 @@ public class TakeMedDialogFragment extends SupportBlurDialogFragment {
 
     public static TakeMedDialogFragment newInstance(UserMedicine med, long datetime, String t) {
         TakeMedDialogFragment f = new TakeMedDialogFragment();
-        // Supply num input as an argument.
-        /*
-        Bundle args = new Bundle();
-        args.put("num", num);
-        f.setArguments(args);
-        */
         time.setTimeInMillis(datetime);
         timeStr = t;
         umed = med;
@@ -91,6 +102,7 @@ public class TakeMedDialogFragment extends SupportBlurDialogFragment {
         super.onCreate(savedInstanceState);
         adb = AppDatabase.getDatabase(getActivity());
         ttCompleteDao = adb.ttCompleteDao();
+        mTTS = new TextToSpeech(getActivity(), this);
     }
 
     @Override
@@ -98,6 +110,15 @@ public class TakeMedDialogFragment extends SupportBlurDialogFragment {
         View v = inflater.inflate(R.layout.take_med, container, false);
         skip = (Button) v.findViewById(R.id.btn_skip);
         take = (Button) v.findViewById(R.id.btn_take);
+        play = (ImageButton) v.findViewById(R.id.play_audio);
+
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = umed.getName();
+                mTTS.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+            }
+        });
 
         TextView timeTV = (TextView) v.findViewById(R.id.time);
         timeTV.setText(timeStr);

@@ -27,13 +27,14 @@ public class MainActivity extends AppCompatActivity
     FragmentMeds fmeds;
     FragmentReport freport;
     FragmentSettings fsettings;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -75,23 +76,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // "меню" нужно поменять
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -100,7 +84,6 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.menu_timetable:
                 fTrans.replace(R.id.container, ftime);
-                //fTrans.addToBackStack(null);
                 break;
             case R.id.menu_meds:
                 fTrans.replace(R.id.container, fmeds);

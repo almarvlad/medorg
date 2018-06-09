@@ -1,0 +1,5 @@
+The following components are provided under the Apache License, Version 2.0. See project link for details.
+
+	(Apache License 2.0) Horizontal-Calendar (devs.mulham.horizontalcalendar:horizontalcalendar:1.3.4 - https://github.com/Mulham-Raee/Horizontal-Calendar)
+
+	(Apache License 2.0) BlurDialogFragment (fr.tvbarthel.blurdialogfragment:lib:2.2.0 - https://github.com/tvbarthel/BlurDialogFragment)
