@@ -18,6 +18,7 @@ public class MedRepo {
 
     private LiveData<List<UserMedicine>> mAllMeds;
     private LiveData<List<Timetable>> timetableList;
+    private LiveData<UserMedicine> medInfo;
 
     public static Long res;
     TimetableMaker ttmaker;
@@ -30,6 +31,7 @@ public class MedRepo {
         AppDatabase db = AppDatabase.getDatabase(application);
         mMedicineDao = db.Dao();
         mAllMeds = mMedicineDao.getAllMeds();
+        //medInfo = mMedicineDao.getById();
 
         mTimetableDao = db.ttDao();
         timetableList = mTimetableDao.getTimetable();
@@ -40,6 +42,9 @@ public class MedRepo {
 
     LiveData<List<UserMedicine>> getAllMeds() {
         return mAllMeds;
+    }
+    LiveData<UserMedicine> getMedInfo(int id){
+        return mMedicineDao.getByIdLiveData(id);
     }
     LiveData<List<Timetable>> getTimetableList() { return timetableList; }
 

@@ -26,7 +26,7 @@ public class TimetableComplete {
     @ColumnInfo(name = "id_med")
     private int idMed;
 
-    @Nullable
+    @Nullable // -1 нет отметки; 0 не принято; 1 принято
     private int completion;
 
     @NonNull

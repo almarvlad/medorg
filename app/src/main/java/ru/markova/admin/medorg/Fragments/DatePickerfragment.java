@@ -8,6 +8,8 @@ import android.support.v4.app.DialogFragment;
 
 import java.util.Calendar;
 
+import ru.markova.admin.medorg.R;
+
 public class DatePickerfragment extends DialogFragment {
     @NonNull
     @Override
@@ -17,6 +19,6 @@ public class DatePickerfragment extends DialogFragment {
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
         // выставляем в диалоге с выбором даты текущую дату
-        return new DatePickerDialog(getActivity(), (DatePickerDialog.OnDateSetListener) getActivity(), year, month, day);
+        return new DatePickerDialog(getActivity(), R.style.DialogTheme, (DatePickerDialog.OnDateSetListener) getActivity(), year, month, day);
     }
 }

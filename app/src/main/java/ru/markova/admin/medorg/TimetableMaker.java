@@ -59,9 +59,11 @@ public class TimetableMaker {
 
     byte thisWeekday;
 
+    //private static TimetableMaker INSTANCE;
+
     //private TimetableViewModel mTimetableViewModel;
 
-    public TimetableMaker(Context cntxt) {
+    public TimetableMaker (Context cntxt) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(cntxt);
         context = cntxt;
         mealCount = Integer.parseInt(prefs.getString("meal_count", "3"));
@@ -77,15 +79,19 @@ public class TimetableMaker {
             dao = adb.Dao();
             ttDao = adb.ttDao();
             ttCompleteDao = adb.ttCompleteDao();
-
-            //mTimetableViewModel = ViewModelProviders.of(cntxt).get(TimetableViewModel.class);
-
             setMealTime();
         }
     }
 
+    public void deleteMedBeforeUpdate(long medid){
+        ttDao.deleteMedFromTimetable(medid);
+    }
+
     public void clearDayTimetable(){
         day.clear();
+        for (MealAround meal: mealList) {
+            meal.clearMedsAround();
+        }
     }
     public void setPriority(char d) {
         thisWeekday = Byte.parseByte("" + d);
@@ -185,8 +191,10 @@ public class TimetableMaker {
 
     public void createNextAlarm() {
         final Calendar curr = Calendar.getInstance();
+        Date d = new Date(ttCompleteDao.nextAlarmTime(curr.getTimeInMillis()));
         am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         final Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra("dateTime", ttCompleteDao.nextAlarmTime(curr.getTimeInMillis()));
         pi = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, ttCompleteDao.nextAlarmTime(curr.getTimeInMillis()), pi);
@@ -270,7 +278,7 @@ public class TimetableMaker {
                     for (int i = 0; i < med.getTimePer(); i++) { // для каждого раза в день
                         if (recomInterval >= dayFull-dayDuration)
                             tempTime = db + recomInterval*i;
-                        else tempTime = (recomInterval / 2) + recomInterval*i;
+                        else tempTime = recomInterval*(i+1);
                         day.add(new TimeMark(tempTime, (int)med.getID()));
                     }
                     break;
@@ -349,6 +357,11 @@ public class TimetableMaker {
             day.add(new TimeMark(mealTime, -1));                                    // -1 - значит приём пищи
             for (int i = 0; i < atMeal.size(); i++) { day.add(atMeal.get(i)); }           // лекарства во время еды
             for (int i = 0; i < afterMeal.size(); i++) { day.add(afterMeal.get(i)); }     // лекарства после еды
+        }
+        public void clearMedsAround(){
+            beforeMeal.clear();
+            atMeal.clear();
+            afterMeal.clear();
         }
     }
 

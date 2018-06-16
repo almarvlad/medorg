@@ -13,14 +13,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import ru.markova.admin.medorg.Fragments.FragmentMeds;
 import ru.markova.admin.medorg.Fragments.FragmentReport;
 import ru.markova.admin.medorg.Fragments.FragmentTimetable;
 import ru.markova.admin.medorg.Fragments.FragmentSettings;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     // РАЗДЕЛЫ ПРИЛОЖЕНИЯ (ФРАГМЕНТЫ)
     FragmentTimetable ftime;
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("График приёма");
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -84,15 +85,18 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.menu_timetable:
                 fTrans.replace(R.id.container, ftime);
+                toolbar.setTitle("График приёма");
                 break;
             case R.id.menu_meds:
                 fTrans.replace(R.id.container, fmeds);
+                toolbar.setTitle("Лекарства");
                 break;
             case R.id.menu_report:
-                fTrans.replace(R.id.container, freport);
+                //fTrans.replace(R.id.container, freport);
                 break;
             case R.id.menu_settings:
                 fTrans.replace(R.id.container, fsettings);
+                toolbar.setTitle("Настройки");
                 break;
         }
         fTrans.commit();

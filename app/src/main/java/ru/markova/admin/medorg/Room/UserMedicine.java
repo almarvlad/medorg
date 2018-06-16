@@ -13,7 +13,7 @@ import java.util.Date;
 public class UserMedicine {
     public UserMedicine(/*String name, int timePer, long courseStart,
                         boolean timeType,*/ String weekdays,/* String dose, String doseForm,
-                        byte instruct, String addInstruct,*/ int duration/*, boolean active, boolean hasNoncompat*/) {
+                        byte instruct, String addInstruct,*/ int duration, boolean active/*, boolean hasNoncompat*/) {
         /*
         this.name = name;
         this.timePer = timePer;
@@ -28,8 +28,8 @@ public class UserMedicine {
         this.addInstruct = addInstruct;
         */
         this.duration = duration;
-        /*
         this.isActive = active;
+        /*
         this.hasNoncompat = hasNoncompat;
         */
     }

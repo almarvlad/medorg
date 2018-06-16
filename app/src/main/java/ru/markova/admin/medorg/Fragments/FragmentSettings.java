@@ -12,8 +12,6 @@ import android.view.ViewGroup;
 import ru.markova.admin.medorg.R;
 import ru.markova.admin.medorg.TimePreference;
 
-import ru.markova.admin.medorg.TimePreference;
-
 public class FragmentSettings extends PreferenceFragmentCompat {
     private static final String TAG = "TimePreference";
 
@@ -21,7 +19,7 @@ public class FragmentSettings extends PreferenceFragmentCompat {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Менять заголовок
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Настройки");
+        //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Настройки");
         setHasOptionsMenu(false);
     }
 
@@ -50,4 +48,25 @@ public class FragmentSettings extends PreferenceFragmentCompat {
             super.onDisplayPreferenceDialog(preference);
         }
     }
+
+    /*
+    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object value) {
+
+            String stringValue = value.toString();
+
+            if (preference instanceof Preference) {
+
+
+
+
+            }
+
+            return true;
+        }
+
+    };
+    */
 }

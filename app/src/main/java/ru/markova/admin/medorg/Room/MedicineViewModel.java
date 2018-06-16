@@ -12,6 +12,7 @@ public class MedicineViewModel extends AndroidViewModel {
     private MedRepo mRepository;
 
     private LiveData<List<UserMedicine>> mAllMeds;  // LiveData
+    private LiveData<UserMedicine> currMedInfo;
     private List<UserMedicine> medsAL;              // лист самих записей о лекарствах
     private String[] medsCount;                     // массив названий лекарств
 
@@ -19,11 +20,16 @@ public class MedicineViewModel extends AndroidViewModel {
         super(app);
         mRepository = new MedRepo(app);
         mAllMeds = mRepository.getAllMeds();
+        //currMedInfo = mRepository.getMedInfo();
         medsCount = mRepository.mMedicineDao.medsCount();
         medsAL = mRepository.mMedicineDao.getAllMedsAL();
     }
 
     public LiveData<List<UserMedicine>> getAllMeds() { return mAllMeds; }
+
+    public LiveData<UserMedicine> getCurrentMed(int id){
+        return mRepository.getMedInfo(id);
+    }
 
     public String[] getMedsCount() {
         return medsCount;

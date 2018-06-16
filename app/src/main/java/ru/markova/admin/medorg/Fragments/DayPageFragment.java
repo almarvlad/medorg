@@ -101,8 +101,7 @@ public class DayPageFragment extends Fragment {
         //Date d1 = new Date(date_one.getTimeInMillis());
         //Date d2 = new Date(date_two.getTimeInMillis());
         List<TimeMarkLong> listTime = new ArrayList<TimeMarkLong>();
-        listTime = ttCompleteDao.getDistinctTimeList(date_one.getTimeInMillis(), date_two.getTimeInMillis());
-
+        listTime = ttCompleteDao.getDistinctTimeList(date_one.getTimeInMillis(), date_two.getTimeInMillis()-1);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         int mealCount = Integer.parseInt(prefs.getString("meal_count", "3"));

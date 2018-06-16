@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ru.markova.admin.medorg.MedAdd;
+import ru.markova.admin.medorg.R;
 import ru.markova.admin.medorg.Room.MedicineViewModel;
 import ru.markova.admin.medorg.Room.UserMedicine;
 
@@ -66,7 +67,7 @@ public class FragmentMeds extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         //Менять заголовок
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Лекарства");
+        //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Лекарства");
 
     }
 
@@ -74,22 +75,22 @@ public class FragmentMeds extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // связываем с файлом вёрстки
-        View v = inflater.inflate(ru.markova.admin.medorg.R.layout.fragment_meds, container, false);
+        final View v = inflater.inflate(ru.markova.admin.medorg.R.layout.fragment_meds, container, false);
 
-        RecyclerView recyclerView = v.findViewById(ru.markova.admin.medorg.R.id.recycler_meds); // наш список медикаментов
+        final RecyclerView recyclerView = v.findViewById(ru.markova.admin.medorg.R.id.recycler_meds); // наш список медикаментов
         final MedicineListAdapter adapter = new MedicineListAdapter(getActivity()); // адаптер для recyclerview
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mMedicineViewModel = ViewModelProviders.of(this).get(MedicineViewModel.class);
-        /* нужно что-то прописать для того, чтобы плашка была, если нет медикаментов
-        if (mMedicineViewModel.getMedsCount().length == 0) {
-            v.findViewById(R.id.no_meds).setVisibility(View.VISIBLE);
-        } */
         mMedicineViewModel.getAllMeds().observe(this, new Observer<List<UserMedicine>>() {
             @Override
             public void onChanged(@Nullable final List<UserMedicine> words) {
                 adapter.setWords(words); // обновить кэш-копию слов в репозитории
+                // отображение замещающего текста в случае, если лекарств нет
+                if (recyclerView.getAdapter().getItemCount() == 0) {
+                    v.findViewById(R.id.no_meds).setVisibility(View.VISIBLE);
+                } else v.findViewById(R.id.no_meds).setVisibility(View.GONE);
             }
         });
 

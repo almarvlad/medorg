@@ -31,13 +31,13 @@
         <activity
             android:name=".MedInfo"
             android:label="@string/title_activity_scrolling"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <service android:name=".NotificationService"></service>
+        <service android:name=".NotificationService" />
 
-        <receiver android:name=".AlarmReceiver"></receiver>
+        <receiver android:name=".AlarmReceiver" />
 
-        <activity android:name=".MedEdit"></activity>
+        <activity android:name=".EditTimetable"></activity>
     </application>
 
 </manifest>

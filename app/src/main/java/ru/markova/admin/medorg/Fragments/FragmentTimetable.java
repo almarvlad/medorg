@@ -87,7 +87,7 @@ public class FragmentTimetable extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         //Менять заголовок
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("График приёма");
+        //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("График приёма");
         setHasOptionsMenu(true);
         //
     }

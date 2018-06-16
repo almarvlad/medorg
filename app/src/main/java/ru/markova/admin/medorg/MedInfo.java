@@ -1,9 +1,14 @@
 package ru.markova.admin.medorg;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,8 +25,10 @@ import ru.markova.admin.medorg.Room.AppDatabase;
 import ru.markova.admin.medorg.Room.MedicineDao;
 import ru.markova.admin.medorg.Room.MedicineViewModel;
 import ru.markova.admin.medorg.Room.NonCompatMeds;
+import ru.markova.admin.medorg.Room.TimetableCompleteDao;
 import ru.markova.admin.medorg.Room.UserMedicine;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -38,10 +45,13 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
 
     AppDatabase adb;
     MedicineDao dao;
+    TimetableCompleteDao ttCompleteDao;
+
 
     private TextToSpeech mTTS;
     private FloatingActionButton fab;
     private Button editMed;
+    private Button stopMed;
 
     private MedicineViewModel mMedicineViewModel;
 
@@ -55,7 +65,7 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle("");
 
@@ -65,12 +75,27 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
 
         adb = AppDatabase.getDatabase(MedInfo.this);
         dao = adb.Dao();
+        ttCompleteDao = adb.ttCompleteDao();
         med = dao.getById(medID);
         nc = dao.getNoncompat(medID);
 
-        setMedInfo(med, nc);
+        final AppBarLayout header = (AppBarLayout) findViewById(R.id.app_bar);
+        stopMed = (Button) findViewById(R.id.stopmed);
+        if (!med.isActive()) {
+            header.setBackgroundColor(getResources().getColor(R.color.colorStoppedMed));
+            stopMed.setText("Возобновить");
+        }
 
         mMedicineViewModel = ViewModelProviders.of(this).get(MedicineViewModel.class);
+
+        mMedicineViewModel.getCurrentMed((int)medID).observe(this, new Observer<UserMedicine>() {
+            @Override
+            public void onChanged(@Nullable final UserMedicine med) {
+                //adapter.setWords(words); // обновить кэш-копию слов в репозитории
+                if (med != null)
+                    setMedInfo(med, nc);
+            }
+        });
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -85,9 +110,34 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
         editMed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent editMedActivity = new Intent(getApplication(), MedEdit.class);
+                Intent editMedActivity = new Intent(getApplication(), MedAdd.class);
                 editMedActivity.putExtra("id", medID);
                 startActivity(editMedActivity);
+            }
+        });
+
+
+        stopMed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (med.isActive()) {
+                    header.setBackgroundColor(getResources().getColor(R.color.colorStoppedMed));
+                    stopMed.setText("Возобновить");
+                    med.setActive(false);
+                    dao.setStoppedMed(medID);
+                    ttCompleteDao.stopMed(medID, Calendar.getInstance().getTimeInMillis());
+                } else {
+                    header.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                    stopMed.setText("Остановить");
+                    dao.setActiveMed(medID);
+                    med.setActive(true);
+                    new MedAdd.updateMedAsyncTask(med, new TimetableMaker(getBaseContext())).execute();
+                    //ttCompleteDao.stopMed(medID, Calendar.getInstance().getTimeInMillis());
+                }
+
+                //header.setContentScrimColor(getResources().getColor(R.color.colorStoppedMed));
+                //header.setContentScrim(new ColorDrawable(getResources().getColor(R.color.colorStoppedMed)));
+                //actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorStoppedMed)));
             }
         });
 
@@ -193,7 +243,7 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
                     res += weekdays_list[i-1] + ", ";
                 }
             }
-            res.substring(0,res.length()-2);
+            res = res.substring(0,res.length()-2);
         }
         return res;
     }
