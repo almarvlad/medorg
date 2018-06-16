@@ -101,7 +101,7 @@ public class MedAdd extends AppCompatActivity implements DatePickerDialog.OnDate
         medID = intent.getLongExtra("id", -1);
         if (medID > -1) { // если передали ид лекарства, то выгружаем инфу о нём и потом заполнем соответствующие поля
             actionBar.setTitle("Изменить лекарство");
-            ttmaker = new TimetableMaker(getBaseContext());
+            ttmaker = TimetableMaker.getInstance(getBaseContext());
 
             umed = dao.getById(medID);
             nc = dao.getNoncompat(medID);

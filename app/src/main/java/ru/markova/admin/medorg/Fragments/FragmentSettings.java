@@ -1,19 +1,23 @@
 package ru.markova.admin.medorg.Fragments;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import ru.markova.admin.medorg.R;
 import ru.markova.admin.medorg.TimePreference;
+import ru.markova.admin.medorg.TimetableMaker;
 
-public class FragmentSettings extends PreferenceFragmentCompat {
+public class FragmentSettings extends PreferenceFragmentCompat /*implements SharedPreferences.OnSharedPreferenceChangeListener*/ {
     private static final String TAG = "TimePreference";
+    SharedPreferences prefs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -21,6 +25,11 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         //Менять заголовок
         //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Настройки");
         setHasOptionsMenu(false);
+
+        /*
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        prefs.registerOnSharedPreferenceChangeListener(this);
+        */
     }
 
     @Override
@@ -47,6 +56,30 @@ public class FragmentSettings extends PreferenceFragmentCompat {
         else {
             super.onDisplayPreferenceDialog(preference);
         }
+    }
+
+    /*
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        TimetableMaker ttMaker = TimetableMaker.getInstance(getContext());
+        if (key.equals("day_begin")) {
+            ttMaker.setDayBegin(prefs.getInt("day_begin", 360));
+        };
+        if (key.equals("day_end")) {
+            ttMaker.setDayEnd(prefs.getInt("day_end", 1320));
+        };
+        if (key.equals("meal_count")) {
+            ttMaker.setMealCount(Integer.parseInt(prefs.getString("meal_count", "3")));
+        };
+
+        for (int i = 1; i <= 7; i++) {
+            ttMaker.setPriority((char)i);
+            ttMaker.setTimeAllMeds();
+            ttMaker.sortAndSaveTimetable();
+            ttMaker.clearDayTimetable();
+        }
+        ttMaker.createHistoryTable();
+        ttMaker.createNextAlarm();
     }
 
     /*

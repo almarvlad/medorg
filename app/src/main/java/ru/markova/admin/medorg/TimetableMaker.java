@@ -31,18 +31,18 @@ import java.util.List;
 import static java.lang.Math.abs;
 
 public class TimetableMaker {
-    final int mealInterval = 120; // = 2часа - минимальный интервал между приёмами пищи
-    final int stInterval = 30;  // стандартный минимальный интервал между приёмами лекарств + возможен перед завтраком
+    static final int mealInterval = 120; // = 2часа - минимальный интервал между приёмами пищи
+    static final int stInterval = 30;  // стандартный минимальный интервал между приёмами лекарств + возможен перед завтраком
                                 // а так же минимальный интервал для приёма до и после еды
-    final int dayFull = 1440;   // кол-во минут в сутках всего
-    final int hour = 60;        // просто час
-    int de, db, dayDuration, mealCount;
+    static final int dayFull = 1440;   // кол-во минут в сутках всего
+    static final int hour = 60;        // просто час
+    static int de, db, dayDuration, mealCount;
 
-    AppDatabase adb;
-    MedicineDao dao;
-    TimetableDao ttDao;
-    TimetableCompleteDao ttCompleteDao;
-    List<UserMedicine> userMeds;
+    static AppDatabase adb;
+    static MedicineDao dao;
+    static TimetableDao ttDao;
+    static TimetableCompleteDao ttCompleteDao;
+    static List<UserMedicine> userMeds;
     List<Timetable> dayTimetable;
     List<MedSpec> priorityList; // здесь лекарства выстроены в порядке по приоритету,
                                 // учитывающему и кол-во связей и сочетание с пищей
@@ -59,28 +59,72 @@ public class TimetableMaker {
 
     byte thisWeekday;
 
-    //private static TimetableMaker INSTANCE;
+    private static TimetableMaker INSTANCE;
 
     //private TimetableViewModel mTimetableViewModel;
 
-    public TimetableMaker (Context cntxt) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(cntxt);
-        context = cntxt;
-        mealCount = Integer.parseInt(prefs.getString("meal_count", "3"));
-        db = prefs.getInt("day_begin", 360);
-        de = prefs.getInt("day_end", 1320);
-        int minDay = mealCount*mealInterval + stInterval; // минимальная длина дня = кол-во приёмов пищи * 2 часа + 30 минут утром
+    private TimetableMaker(int dbeg, int dend, String meals, Context cnt){
+        context = cnt;
+        adb = AppDatabase.getDatabase(cnt);
+        dao = adb.Dao();
+        ttDao = adb.ttDao();
+        ttCompleteDao = adb.ttCompleteDao();
+        db = dbeg;
+        de = dend;
+        mealCount = Integer.parseInt(meals);
+        int minDay = mealCount * mealInterval + stInterval; // минимальная длина дня = кол-во приёмов пищи * 2 часа + 30 минут утром
+        setDayDuration();
+
+        // если минимальная длина дня меньше или равна фактической (установленной пользователем),
+        if (minDay <= dayDuration) {    // то можно производиь расчёты дальше
+            setMealTime();
+        } // хм тут тоже что-то надо :с
+    }
+
+    public static TimetableMaker getInstance(Context cntxt) {
+        if (INSTANCE == null) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(cntxt);
+            INSTANCE = new TimetableMaker(prefs.getInt("day_begin", 360),
+                    prefs.getInt("day_end", 1320),
+                    prefs.getString("meal_count", "3"), cntxt);
+        }
+        return INSTANCE;
+    }
+
+    public void setDayBegin(int daybegin){
+        db = daybegin;
+        int minDay = mealCount * mealInterval + stInterval; // минимальная длина дня = кол-во приёмов пищи * 2 часа + 30 минут утром
+        setDayDuration();
+        // если минимальная длина дня меньше или равна фактической (установленной пользователем),
+        if (minDay <= dayDuration) {    // то можно производиь расчёты дальше
+            setMealTime();
+        }
+    }
+
+    public void setDayEnd(int dayend){
+        de = dayend;
+        int minDay = mealCount * mealInterval + stInterval; // минимальная длина дня = кол-во приёмов пищи * 2 часа + 30 минут утром
+        setDayDuration();
+        // если минимальная длина дня меньше или равна фактической (установленной пользователем),
+        if (minDay <= dayDuration) {    // то можно производиь расчёты дальше
+            setMealTime();
+        }
+    }
+
+    public void setMealCount(int meals){
+        mealCount = meals;
+        int minDay = mealCount * mealInterval + stInterval; // минимальная длина дня = кол-во приёмов пищи * 2 часа + 30 минут утром
+        setDayDuration();
+        // если минимальная длина дня меньше или равна фактической (установленной пользователем),
+        if (minDay <= dayDuration) {    // то можно производиь расчёты дальше
+            setMealTime();
+        }
+    }
+
+    public void setDayDuration(){
         if (de < db)
             dayDuration = (dayFull - db) + de;
         else dayDuration = de - db;
-                                        // если минимальная длина дня меньше или равна фактической (установленной пользователем),
-        if (minDay <= dayDuration) {    // то можно производиь расчёты дальше
-            adb = AppDatabase.getDatabase(cntxt);
-            dao = adb.Dao();
-            ttDao = adb.ttDao();
-            ttCompleteDao = adb.ttCompleteDao();
-            setMealTime();
-        }
     }
 
     public void deleteMedBeforeUpdate(long medid){

@@ -131,7 +131,7 @@ public class MedInfo extends AppCompatActivity implements TextToSpeech.OnInitLis
                     stopMed.setText("Остановить");
                     dao.setActiveMed(medID);
                     med.setActive(true);
-                    new MedAdd.updateMedAsyncTask(med, new TimetableMaker(getBaseContext())).execute();
+                    new MedAdd.updateMedAsyncTask(med, TimetableMaker.getInstance(getBaseContext())).execute();
                     //ttCompleteDao.stopMed(medID, Calendar.getInstance().getTimeInMillis());
                 }
 

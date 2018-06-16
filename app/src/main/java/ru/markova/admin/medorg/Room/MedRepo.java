@@ -37,7 +37,7 @@ public class MedRepo {
         timetableList = mTimetableDao.getTimetable();
 
         mTimetableCompleteDao = db.ttCompleteDao();
-        ttmaker = new TimetableMaker(application);
+        ttmaker = TimetableMaker.getInstance(application);
     }
 
     LiveData<List<UserMedicine>> getAllMeds() {
