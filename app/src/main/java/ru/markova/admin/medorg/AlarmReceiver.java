@@ -41,6 +41,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         ttCompleteDao = adb.ttCompleteDao();
         medicineDao = adb.Dao();
 
+        int notId = 1;
+
         long currTime = intent.getLongExtra("dateTime", -1);
         List<TimetableComplete> meds = ttCompleteDao.selectMedsAtTime(currTime);
         String title;
@@ -54,7 +56,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             notifyText = notifyText.substring(0, notifyText.length()-2);
         } else {
             title = "Приём пищи";
-            notifyText = "Соблюдение режима питания вместе с приёмом лекарств способсвуют успешному лечению.";
+            notifyText = "Соблюдение режима питания вместе с приёмом лекарств способствует успешному лечению.";
         }
 
         // Create PendingIntent
@@ -86,14 +88,18 @@ public class AlarmReceiver extends BroadcastReceiver {
                         .setVisibility(VISIBILITY_PUBLIC);
 
         if (meds.size() > 0) {
-            Intent skipIntent = new Intent(context, NotificationService.class);
-            skipIntent.setAction("ru.startandroid.notifications.action_delete"); // ЭЭЭЭ?
-            PendingIntent skipPendingIntent = PendingIntent.getService(context, 0, skipIntent, 0);
+            Intent skipIntent = new Intent(context, NotificationButtonListener.class);
+            skipIntent.putExtra("datetime", currTime);
+            skipIntent.setAction("skip_action");
+            skipIntent.putExtra("notification_id", notId);
+            PendingIntent skipPendingIntent = PendingIntent.getBroadcast(context, 0, skipIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.addAction(R.drawable.ic_cancel_all_40, "Пропустить все", skipPendingIntent);
 
-            Intent takeIntent = new Intent(context, NotificationService.class);
-            takeIntent.setAction("ru.startandroid.notifications.action_delete"); // ЭЭЭЭ?
-            PendingIntent takePendingIntent = PendingIntent.getService(context, 0, takeIntent, 0);
+            Intent takeIntent = new Intent(context, NotificationButtonListener.class);
+            takeIntent.putExtra("datetime", currTime);
+            takeIntent.putExtra("notification_id", notId);
+            takeIntent.setAction("done_action"); // ЭЭЭЭ?
+            PendingIntent takePendingIntent = PendingIntent.getService(context, 0, takeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.addAction(R.drawable.ic_done_all_40, "Принять все", takePendingIntent);
 
         }
@@ -112,7 +118,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             notificationManager.createNotificationChannel(channel);
         }
         */
-        notificationManager.notify(1, notification);
+        notificationManager.notify(notId, notification);
 
 
 

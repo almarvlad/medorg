@@ -1,6 +1,7 @@
 package ru.markova.admin.medorg.Fragments;
 
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -12,10 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ru.markova.admin.medorg.R;
+import ru.markova.admin.medorg.Room.MedicineDao;
+import ru.markova.admin.medorg.Room.TimetableCompleteDao;
+import ru.markova.admin.medorg.Room.TimetableDao;
 import ru.markova.admin.medorg.TimePreference;
 import ru.markova.admin.medorg.TimetableMaker;
 
-public class FragmentSettings extends PreferenceFragmentCompat /*implements SharedPreferences.OnSharedPreferenceChangeListener*/ {
+public class FragmentSettings extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "TimePreference";
     SharedPreferences prefs;
 
@@ -26,10 +30,10 @@ public class FragmentSettings extends PreferenceFragmentCompat /*implements Shar
         //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Настройки");
         setHasOptionsMenu(false);
 
-        /*
+
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         prefs.registerOnSharedPreferenceChangeListener(this);
-        */
+
     }
 
     @Override
@@ -58,7 +62,7 @@ public class FragmentSettings extends PreferenceFragmentCompat /*implements Shar
         }
     }
 
-    /*
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         TimetableMaker ttMaker = TimetableMaker.getInstance(getContext());
@@ -71,35 +75,26 @@ public class FragmentSettings extends PreferenceFragmentCompat /*implements Shar
         if (key.equals("meal_count")) {
             ttMaker.setMealCount(Integer.parseInt(prefs.getString("meal_count", "3")));
         };
-
-        for (int i = 1; i <= 7; i++) {
-            ttMaker.setPriority((char)i);
-            ttMaker.setTimeAllMeds();
-            ttMaker.sortAndSaveTimetable();
-            ttMaker.clearDayTimetable();
-        }
-        ttMaker.createHistoryTable();
-        ttMaker.createNextAlarm();
+        new updateTimetableAsyncTask(ttMaker).execute();
     }
 
-    /*
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+    private static class updateTimetableAsyncTask extends AsyncTask<Void, Void, Void> {
+        private final TimetableMaker ttMaker;
 
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-
-            String stringValue = value.toString();
-
-            if (preference instanceof Preference) {
-
-
-
-
-            }
-
-            return true;
+        updateTimetableAsyncTask(TimetableMaker ttm) {
+            ttMaker = ttm;
         }
-
-    };
-    */
+        @Override
+        protected Void doInBackground(Void... params) {
+            for (int i = 1; i <= 7; i++) {
+                ttMaker.setPriority(Character.forDigit(i, 10));
+                ttMaker.setTimeAllMeds();
+                ttMaker.sortAndSaveTimetable();
+                ttMaker.clearDayTimetable();
+            }
+            ttMaker.createHistoryTable();
+            ttMaker.createNextAlarm();
+            return null;
+        }
+    }
 }

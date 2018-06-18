@@ -6,10 +6,6 @@
         android:minSdkVersion="16"
         android:targetSdkVersion="24" />
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_test"
@@ -36,6 +32,7 @@
         <service android:name=".NotificationService" />
 
         <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".NotificationButtonListener" />
 
         <activity android:name=".EditTimetable"></activity>
     </application>

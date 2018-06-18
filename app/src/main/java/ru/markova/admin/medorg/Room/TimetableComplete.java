@@ -17,7 +17,7 @@ public class TimetableComplete {
     @PrimaryKey(autoGenerate = true)
     @NonNull
     @ColumnInfo(name = "id")
-    private int id;
+    private long id;
 
     @ColumnInfo(name = "date_time")
     private long dateTime; // дата и время приёма лекарства
@@ -30,8 +30,8 @@ public class TimetableComplete {
     private int completion;
 
     @NonNull
-    public int getId() { return id; }
-    public void setId(@NonNull int id) { this.id = id; }
+    public long getId() { return id; }
+    public void setId(@NonNull long id) { this.id = id; }
 
     public long getDateTime() { return dateTime; }
     public void setDateTime(long dateTime) { this.dateTime = dateTime; }

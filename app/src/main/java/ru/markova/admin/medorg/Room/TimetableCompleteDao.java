@@ -51,6 +51,9 @@ public interface TimetableCompleteDao {
 
     @Query("SELECT date_time FROM TimetableComplete WHERE (date_time > :currTime) ORDER BY date_time LIMIT 1")
     long nextAlarmTime(long currTime);
+
+    @Query("UPDATE TimetableComplete SET completion = :comp WHERE date_time = :dateTime")
+    void updateFromNotification(int comp, long dateTime);
 /*
     SELECT time, mark
         FROM   timetable s1

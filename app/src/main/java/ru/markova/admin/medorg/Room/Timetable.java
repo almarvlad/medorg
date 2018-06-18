@@ -9,14 +9,14 @@ import android.support.annotation.Nullable;
 
 @Entity(tableName = "timetable")
 public class Timetable {
-    public void setId(@NonNull int id) {
+    public void setId(@NonNull long id) {
         this.id = id;
     }
 
     @PrimaryKey(autoGenerate = true)
     @NonNull
     @ColumnInfo(name = "id")
-    private int id;
+    private long id;
 
     @NonNull // номер дня недели
     private byte weekday;
@@ -43,5 +43,5 @@ public class Timetable {
     public void setWeekday(@NonNull byte weekday) { this.weekday = weekday; }
 
     @NonNull
-    public int getId() { return id; }
+    public long getId() { return id; }
 }
