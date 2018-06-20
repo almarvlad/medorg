@@ -89,7 +89,7 @@ public class MedAdd extends AppCompatActivity implements DatePickerDialog.OnDate
         editTimeFreq = (EditText) findViewById(R.id.editTimeFreq);
         editTimeInt = (EditText) findViewById(R.id.editTimeInt);
         final RadioGroup rdg_days = (RadioGroup) findViewById(R.id.days_rdg);
-        final RadioGroup rdg = (RadioGroup) findViewById(R.id.duration_rdg);
+        //final RadioGroup rdg = (RadioGroup) findViewById(R.id.duration_rdg);
         editDose = (EditText) findViewById(R.id.editDose);
         add_instr = (EditText) findViewById(R.id.add_instr);
         spinFormDose = (Spinner) findViewById(R.id.spinDose);
@@ -121,6 +121,7 @@ public class MedAdd extends AppCompatActivity implements DatePickerDialog.OnDate
             umed = new UserMedicine("", 0, true);
         }
 
+        /*
         // ПРОДОЛЖИТЕЛЬНОСТЬ КУРСА
         // если выбрано фиксированное кол-во дней, то создать новое диалоговое окно с вводом
         fixedDays = (RadioButton) findViewById(R.id.radio_numdays);
@@ -180,6 +181,7 @@ public class MedAdd extends AppCompatActivity implements DatePickerDialog.OnDate
                 alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getBaseContext(), R.color.colorPrimaryDark));
             }
         });
+        */
 
         // ВЫБОР ДНЕЙ ПРИЁМА
         weekdays_list = getResources().getStringArray(R.array.weekdays); // образуем массив из строковых ресурсов
@@ -245,6 +247,7 @@ public class MedAdd extends AppCompatActivity implements DatePickerDialog.OnDate
             }
         });
 
+        /*
         // выставляем текущую дату и вешаем на него обработчик нажатия
         String currDate;
         if (medID > -1)
@@ -261,6 +264,7 @@ public class MedAdd extends AppCompatActivity implements DatePickerDialog.OnDate
 //                alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(getBaseContext(), R.color.colorPrimaryDark));
             }
         });
+        */
 
         // настройка видимости для полей ввода времени приёма
         RadioGroup rdg_time = (RadioGroup) findViewById(R.id.time_rdg);
@@ -388,8 +392,10 @@ public class MedAdd extends AppCompatActivity implements DatePickerDialog.OnDate
                     umed.setName(editMedName.getText().toString());
                     umed.setTimePer(t);
                     umed.setTimeType(timetype);
+
                     if (medID == -1)
                         umed.setCourseStart(c.getTime().getTime());
+
                     umed.setWeekdays(num);
                     umed.setDose(editDose.getText().toString());
                     umed.setDoseForm(spinFormDose.getSelectedItem().toString());

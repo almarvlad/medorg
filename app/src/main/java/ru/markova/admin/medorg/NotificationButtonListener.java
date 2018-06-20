@@ -24,10 +24,10 @@ public class NotificationButtonListener extends BroadcastReceiver {
         String action = intent.getAction();
         int nid = intent.getIntExtra("notification_id", 1);
 
-        if(action.equals("skip_action")) {
-            ttCompleteDao.updateFromNotification(0, time);
-        } else {
+        if(action.equals("done_action")) {
             ttCompleteDao.updateFromNotification(1, time);
+        } else if(action.equals("skip_action")){
+            ttCompleteDao.updateFromNotification(0, time);
         }
         notificationManager.cancel(nid);
     }

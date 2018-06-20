@@ -101,6 +101,7 @@ public class TimetableMaker {
         }
     }
 
+
     public void setDayEnd(int dayend){
         de = dayend;
         int minDay = mealCount * mealInterval + stInterval; // минимальная длина дня = кол-во приёмов пищи * 2 часа + 30 минут утром
@@ -206,12 +207,13 @@ public class TimetableMaker {
             int dayNumber = (c.get(Calendar.DAY_OF_WEEK)-1 > 0) ? c.get(Calendar.DAY_OF_WEEK)-1 : 7; // находим день недели текущей даты
 
             // получаем расписание для этого дня недели
-            if (j > 0) { // если НЕ текущий день
+            //if (j > 0) { // если НЕ текущий день
                 dayTimetable = ttDao.getWeekdayTimetable(dayNumber);
+                /*
             } else {
                 dayTimetable = ttDao.getWeekdayTimetableFromCurrTime(dayNumber, nowTime);
                 j++;
-            }
+            }*/
 
             // давайте пока обойдёмся без текущего времени, хорошо?
             for (int i = 0; i < dayTimetable.size(); i++) {

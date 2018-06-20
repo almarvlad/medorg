@@ -2,7 +2,9 @@ package ru.markova.admin.medorg.Fragments;
 
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
+import android.content.SharedPreferences;
 import android.graphics.drawable.NinePatchDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,13 +31,19 @@ import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropM
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import ru.markova.admin.medorg.R;
 import ru.markova.admin.medorg.Room.AppDatabase;
 import ru.markova.admin.medorg.Room.MedicineDao;
+import ru.markova.admin.medorg.Room.NonCompatMeds;
 import ru.markova.admin.medorg.Room.Timetable;
+import ru.markova.admin.medorg.Room.TimetableCompleteDao;
 import ru.markova.admin.medorg.Room.TimetableDao;
+import ru.markova.admin.medorg.Room.UserMedicine;
+import ru.markova.admin.medorg.TimetableMaker;
 
 
 public class EditTimetableFragment extends Fragment {
@@ -44,7 +52,7 @@ public class EditTimetableFragment extends Fragment {
     static final String TAG = "DRAGNDROP";
     int pageNumber;
 
-
+    TimetableMaker ttMaker;
     int db, de;
 
     public List<MyItem> getItems() {
@@ -55,6 +63,7 @@ public class EditTimetableFragment extends Fragment {
 
     AppDatabase adb = AppDatabase.getDatabase(getContext());
     TimetableDao ttDao = adb.ttDao();
+    TimetableCompleteDao ttCompleteDao = adb.ttCompleteDao();
     MedicineDao mDao = adb.Dao();
 
 //    private RecyclerView.LayoutManager mLayoutManager;
@@ -74,6 +83,7 @@ public class EditTimetableFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pageNumber = getArguments().getInt(ARGUMENT_PAGE_NUMBER);
+        ttMaker = TimetableMaker.getInstance(getContext());
 
         int savedPageNumber = -1;
         if (savedInstanceState != null) {
@@ -184,12 +194,15 @@ public class EditTimetableFragment extends Fragment {
                 time.setText(mItems.get(position).timeStr);
 
                 ttDao.updateRowTimetable(timeall, mItems.get(position).id_DB);
+                new updateTimeAsyncTask(ttCompleteDao, getArguments().getInt(ARGUMENT_PAGE_NUMBER)+1, timeall/60, timeall%60, position).execute();
+
+                ttMaker.createNextAlarm();
             }
         };
     }
 
 
-    class MyAdapter extends RecyclerView.Adapter<MyViewHolder> implements DraggableItemAdapter<MyViewHolder> {
+    class MyAdapter extends RecyclerView.Adapter<MyViewHolder> /*implements DraggableItemAdapter<MyViewHolder> */{
 
 
         public MyAdapter(List<Timetable> tt) {
@@ -231,6 +244,7 @@ public class EditTimetableFragment extends Fragment {
             return mItems.size();
         }
 
+        /*
         @Override
         public void onMoveItem(int fromPosition, int toPosition) { //срабатывает по окончанию перемещения
             MyItem movedItem = mItems.remove(fromPosition);
@@ -259,7 +273,7 @@ public class EditTimetableFragment extends Fragment {
         @Override
         public void onItemDragStarted(int position) { // находит позицию, с которой началось перемещение
             //Log.d(TAG, "onItemDragStarted position " + position);
-            notifyDataSetChanged();
+            //notifyDataSetChanged();
         }
 
         @Override
@@ -289,8 +303,51 @@ public class EditTimetableFragment extends Fragment {
 
             }
             ttDao.updateRowTimetable(t, mItems.get(toPosition).id_DB);
-            notifyDataSetChanged();
+            new updateTimeAsyncTask(ttCompleteDao, getArguments().getInt(ARGUMENT_PAGE_NUMBER)+1, t/60, t%60, toPosition).execute();
+            //notifyDataSetChanged();
         }
+        */
     }
 
+    //
+    private static class updateTimeAsyncTask extends AsyncTask<Void, Void, Void> {
+        private final TimetableCompleteDao ttCompleteDao;
+        private int wday;
+        private int hour, minute, position;
+
+        updateTimeAsyncTask(TimetableCompleteDao ttCompleteDao, int weekday, int hour, int min, int newpos) {
+            this.ttCompleteDao = ttCompleteDao;
+            wday = weekday;
+            this.hour = hour;
+            minute = min;
+            position = newpos;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            Calendar date1 = Calendar.getInstance();
+            Calendar date2 = Calendar.getInstance();
+            date2.add(Calendar.MONTH, 1); // дата через месяц
+            //int nowTime = date1.get(Calendar.HOUR_OF_DAY)*60 + date1.get(Calendar.MINUTE);
+
+            while (!date1.after(date2)) {
+                int dayNumber = (date1.get(Calendar.DAY_OF_WEEK) - 1 > 0) ? date1.get(Calendar.DAY_OF_WEEK) - 1 : 7; // находим день недели текущей даты
+
+                if (dayNumber == wday) {
+                    Calendar newTime = new GregorianCalendar(date1.get(Calendar.YEAR), date1.get(Calendar.MONTH), date1.get(Calendar.DAY_OF_MONTH), hour, minute, 0);
+                    //текущая дата в цикле
+                    Calendar date_one = new GregorianCalendar(date1.get(Calendar.YEAR), date1.get(Calendar.MONTH), date1.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+                    // текущая дата в цикле + 1 день
+                    Calendar date_two = new GregorianCalendar(date1.get(Calendar.YEAR), date1.get(Calendar.MONTH), date1.get(Calendar.DAY_OF_MONTH), 23, 59, 59);
+                    ttCompleteDao.updateTime(newTime.getTimeInMillis(), date_one.getTimeInMillis(), date_two.getTimeInMillis(), position);
+                }
+
+                // переходим к сл дню - увеличиваем переменную цикла
+                date1.add(Calendar.DATE, 1); // переходим к сл дню
+            }
+
+            return null;
+        }
+    }
 }

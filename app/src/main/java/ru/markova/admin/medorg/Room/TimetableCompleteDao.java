@@ -49,11 +49,15 @@ public interface TimetableCompleteDao {
     @Query("SELECT * FROM TimetableComplete WHERE (id_med > -1) AND date_time = :exactTime")
     List<TimetableComplete> selectMedsAtTime(long exactTime);
 
-    @Query("SELECT date_time FROM TimetableComplete WHERE (date_time > :currTime) ORDER BY date_time LIMIT 1")
+    @Query("SELECT date_time FROM TimetableComplete WHERE (date_time > :currTime) AND completion=-1 ORDER BY date_time LIMIT 1")
     long nextAlarmTime(long currTime);
 
     @Query("UPDATE TimetableComplete SET completion = :comp WHERE date_time = :dateTime")
     void updateFromNotification(int comp, long dateTime);
+
+    @Query("UPDATE TimetableComplete SET date_time = :new_time WHERE id = " +
+            "(SELECT id FROM TimetableComplete WHERE date_time BETWEEN :date_one AND :date_two ORDER BY date_time LIMIT 1 OFFSET :offset)")
+    void updateTime(long new_time, long date_one, long date_two, int offset);
 /*
     SELECT time, mark
         FROM   timetable s1

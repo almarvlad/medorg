@@ -99,7 +99,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             takeIntent.putExtra("datetime", currTime);
             takeIntent.putExtra("notification_id", notId);
             takeIntent.setAction("done_action"); // ЭЭЭЭ?
-            PendingIntent takePendingIntent = PendingIntent.getService(context, 0, takeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent takePendingIntent = PendingIntent.getBroadcast(context, 0, takeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.addAction(R.drawable.ic_done_all_40, "Принять все", takePendingIntent);
 
         }
