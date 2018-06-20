@@ -91,9 +91,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fTrans.replace(R.id.container, fmeds);
                 toolbar.setTitle("Лекарства");
                 break;
-            case R.id.menu_report:
-                //fTrans.replace(R.id.container, freport);
-                break;
+//            case R.id.menu_report:
+//                //fTrans.replace(R.id.container, freport);
+//                break;
             case R.id.menu_settings:
                 fTrans.replace(R.id.container, fsettings);
                 toolbar.setTitle("Настройки");

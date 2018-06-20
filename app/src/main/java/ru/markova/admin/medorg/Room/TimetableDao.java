@@ -27,4 +27,13 @@ public interface TimetableDao {
 
     @Query("DELETE FROM timetable WHERE mark = :id")
     void deleteMedFromTimetable(long id);
+
+    @Query("DELETE FROM timetable")
+    void deleteWholeTimetable();
+
+    @Query("SELECT COUNT(*) FROM timetable WHERE mark > -1")
+    int rowsTimetable();
+
+    @Query("UPDATE timetable SET time=:time WHERE id=:id")
+    int updateRowTimetable(int time, long id);
 }

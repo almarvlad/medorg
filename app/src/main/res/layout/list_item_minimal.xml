@@ -4,32 +4,36 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp">
+    android:id="@+id/timetable_row"
+    >
 
     <!-- Content View(s) -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"/>
+
     <TextView
-        android:id="@android:id/text1"
+        android:id="@+id/text"
+        style="@style/medrow"
+        android:clickable="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:gravity="center"
-        android:layout_centerInParent="true"
-        android:text="Лекарство "
-        android:textAlignment="center"
-        android:textSize="24sp"/>
+        android:text="Лекарство "/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/time_mark"
-        android:textSize="25sp"
-        android:gravity="center"
-        android:textAlignment="center"
+        style="@style/medrow"
         android:layout_alignParentRight="true"
         android:text="13:30">
 
     </TextView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        android:layout_alignBottom="@+id/time_mark"/>
 </RelativeLayout>

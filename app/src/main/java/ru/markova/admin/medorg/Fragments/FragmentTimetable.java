@@ -30,6 +30,8 @@ import java.util.Date;
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import devs.mulham.horizontalcalendar.utils.Utils;
+import ru.markova.admin.medorg.Room.AppDatabase;
+import ru.markova.admin.medorg.Room.TimetableDao;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -91,7 +93,11 @@ public class FragmentTimetable extends Fragment {
         }
         //Менять заголовок
         //((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("График приёма");
-        setHasOptionsMenu(true);
+        AppDatabase adb = AppDatabase.getDatabase(getContext());
+        TimetableDao ttDao = adb.ttDao();
+        int t = ttDao.rowsTimetable();
+        if (ttDao.rowsTimetable() > 0)
+            setHasOptionsMenu(true);
         //
     }
 
