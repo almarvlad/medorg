@@ -38,7 +38,7 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
-                    app:srcCompat="@drawable/ic_play"
+                    app:srcCompat="@drawable/ic_play_white"
                     android:background="@android:color/transparent"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true" />

@@ -125,27 +125,27 @@
             android:gravity="bottom">
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/stopmed"
                 android:layout_width="0dp"
                 android:layout_height="58dp"
                 android:text="@string/stop"
                 android:theme="@style/Facebook.Button"
-                app:layout_constraintEnd_toStartOf="@+id/button2"
+                app:layout_constraintEnd_toStartOf="@+id/editmed"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintHorizontal_weight="1"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/editmed"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="0dp"
-                android:layout_height="58dp"
+                android:layout_height="59dp"
                 android:text="@string/edit"
                 android:theme="@style/Facebook.Button"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toEndOf="@+id/button" />
+                app:layout_constraintStart_toEndOf="@+id/stopmed" />
         </android.support.constraint.ConstraintLayout>
 
 

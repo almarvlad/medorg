@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.admin.medorg">
-    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="24" />
+    package="ru.markova.admin.medorg">
+
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="24" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_test"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -20,20 +23,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MedEdit" />
+        <activity android:name=".MedAdd" />
         <activity
             android:name=".MedInfo"
             android:label="@string/title_activity_scrolling"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <service
-            android:name=".NotificationService">
-        </service>
+        <service android:name=".NotificationService" />
 
-        <receiver android:name=".AlarmReceiver">
+        <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".NotificationButtonListener" />
 
-        </receiver>
+        <activity android:name=".EditTimetable"></activity>
     </application>
 
 </manifest>

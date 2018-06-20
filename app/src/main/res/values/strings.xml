@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MedOrg</string>
+    <string name="app_name">МедОрганайзер</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -99,7 +99,7 @@
     <string name="numDays">количество дней</string>
     <string name="days">Дни приёма:</string>
     <string name="exactDays">определённые дни</string>
-    <string name="compatQuestion">Есть ли несовмесимость с другими лекарствами?</string>
+    <string name="compatQuestion">Есть ли несовместимость с другими лекарствами?</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
